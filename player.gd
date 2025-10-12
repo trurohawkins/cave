@@ -1,18 +1,22 @@
 extends CharacterBody2D
 @export var speed: int = 200
 @export var map: TileMapLayer
-
+@export var GM: Node2D
+var prePos = Vector2(-1, -1)
 var curCollides := {}
 
 func _ready():
 	pass
 
 func _physics_process(_delta):
-
 	var direction = Input.get_vector("left", "right", "up", "down")
 	velocity = direction * speed
 	var dirAdj = velocity.normalized()
 	move_and_slide()
+	if global_position != prePos:
+		#print("moved")
+		GM.occludeChunks(self)
+	prePos = global_position
 	#slideCollision()
 	var newCollides := {}
 	var colCount = get_slide_collision_count()
@@ -20,6 +24,8 @@ func _physics_process(_delta):
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
 		if collider is TileMapLayer:
+			GM.playerDie(self)
+			"""
 			#var colDir = collision.get_position() - position
 			var colPos = collision.get_position()
 			#var dirAdj = velocity.normalized()#colDir.normalized * 20
@@ -29,6 +35,7 @@ func _physics_process(_delta):
 			if not curCollides.has(tilePos):
 				collider.receiveCollision(tilePos)
 			curCollides = newCollides
+			"""
 	"""
 	var shape = $CollisionShape2D.shape
 	var topLeft = map.local_to_map(global_position - shape.extents)

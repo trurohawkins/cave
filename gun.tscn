@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://plw4uxg427gw"]
+
+[ext_resource type="Script" uid="uid://biq0aep5oqjb8" path="res://gun.gd" id="1_dk5gl"]
+[ext_resource type="PackedScene" uid="uid://i17p6qyg72js" path="res://blast.tscn" id="2_8iju2"]
+[ext_resource type="Texture2D" uid="uid://cuuljqsrp7a2c" path="res://gun.png" id="2_kw0bs"]
+
+[node name="Gun" type="Node2D"]
+script = ExtResource("1_dk5gl")
+bulletScene = ExtResource("2_8iju2")
+
+[node name="barrel" type="Sprite2D" parent="."]
+texture = ExtResource("2_kw0bs")
+
+[node name="muzzle" type="Marker2D" parent="barrel"]
+position = Vector2(40, 0)

@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://i17p6qyg72js"]
+
+[ext_resource type="Texture2D" uid="uid://clbhg28hpiuff" path="res://pizza.png" id="1_e54xe"]
+[ext_resource type="Script" uid="uid://bo40l80p8j0vn" path="res://blast.gd" id="1_l5868"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_l5868"]
+
+[node name="blast" type="Area2D"]
+scale = Vector2(10, 10)
+script = ExtResource("1_l5868")
+speed = 400.0
+hitCost = 0.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_l5868")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.770687, 0.7765643)
+texture = ExtResource("1_e54xe")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
