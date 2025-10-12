@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://c5jp5rmk0hlc4"]
+[gd_scene load_steps=9 format=3 uid="uid://c5jp5rmk0hlc4"]
 
 [ext_resource type="Shader" uid="uid://bdvmpay2ytrjf" path="res://chunkTiles.gdshader" id="1_a0kup"]
 [ext_resource type="Texture2D" uid="uid://l4fs7ppxdder" path="res://dirtTileSheet.png" id="1_eat54"]
@@ -9,7 +9,15 @@ shader = ExtResource("1_a0kup")
 shader_parameter/lightPos = Vector2(0, 0)
 shader_parameter/lightRadius = 100.0
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a0kup"]
+shader = ExtResource("1_a0kup")
+shader_parameter/lightPos = Vector2(800, 200)
+shader_parameter/lightRadius = 1500.0
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_eat54"]
+shader = ExtResource("1_a0kup")
+shader_parameter/lightPos = Vector2(800, 200)
+shader_parameter/lightRadius = 1500.0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_aqk2v"]
 texture = ExtResource("1_eat54")
@@ -30,7 +38,7 @@ texture_region_size = Vector2i(32, 32)
 4:0/0/material = SubResource("ShaderMaterial_eat54")
 4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
 0:1/0 = 0
-0:1/0/material = SubResource("ShaderMaterial_eat54")
+0:1/0/material = SubResource("ShaderMaterial_a0kup")
 0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
 1:1/0 = 0
 1:1/0/material = SubResource("ShaderMaterial_eat54")

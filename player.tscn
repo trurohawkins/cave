@@ -9,7 +9,11 @@
 [node name="Player" type="CharacterBody2D"]
 scale = Vector2(10, 10)
 script = ExtResource("1_onrkg")
-speed = 5000
+health = 2
+speed = 10000
+crashPower = 5.0
+crashDecel = 10.0
+staggerPower = 10.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_036b0")

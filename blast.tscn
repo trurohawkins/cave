@@ -6,10 +6,12 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_l5868"]
 
 [node name="blast" type="Area2D"]
+modulate = Color(1, 0.20392157, 0.12156863, 0.24313726)
 scale = Vector2(10, 10)
 script = ExtResource("1_l5868")
-speed = 1000.0
-hitCost = 0.05
+speed = 10.0
+power = 200.0
+hitCost = 0.2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_l5868")

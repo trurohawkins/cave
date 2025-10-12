@@ -46,7 +46,7 @@ func spawnMap():
 			var cur = grid[x][y]
 			cur.spawnChunk()
 			if x == mapSize.x / 2 && y == mapSize.y / 2:
-				cur.hollowCenter(50)
+				cur.hollowCenter(75)
 	for x in range(mapSize.x):
 		for y in range(mapSize.y):
 			var cur = grid[x][y]
@@ -91,4 +91,4 @@ func occludeChunks(player: CharacterBody2D):
 			var dist = max(abs(x - px), abs(y - py))
 			#print(str(x) + ", " + str(y) + " " + str(dist))
 			#1 for square, figure out aspect ratio and do it per x and y
-			grid[x][y].occlude(dist > 2)
+			grid[x][y].occlude(dist >1)

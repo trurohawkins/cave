@@ -29,6 +29,6 @@ func spawnBullet():
 	if bulletScene and coolTimer <= 0:
 		coolTimer = coolDown
 		var bullet = bulletScene.instantiate()
-		get_tree().current_scene.add_child(bullet)
 		bullet.global_position = spawnPoint.global_position
 		bullet.global_rotation = spawnPoint.global_rotation
+		get_tree().current_scene.add_child(bullet)

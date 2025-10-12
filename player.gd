@@ -1,57 +1,78 @@
 extends CharacterBody2D
+@export var health: int = 5
 @export var speed: int = 200
-@export var map: TileMapLayer
-@export var GM: Node2D
+@export var baseDecel: float = 0.5
+var decelSpeed: float = 0.5
+@export var crashPower: float = 10
+@export var crashDecel: float = 2
+@export var highVelocity: float = 2000
+@export var landingPower: float = 0.5
+
+@export var staggerPower: float = 50
+var staggerDelta: float = 10
+var staggerCounter: float = 0
+var staggered: bool = false
+
+var GM: Node2D
 var prePos = Vector2(-1, -1)
 var curCollides := {}
 
 func _ready():
-	pass
+	decelSpeed = baseDecel
 
-func _physics_process(_delta):
-	var direction = Input.get_vector("left", "right", "up", "down")
-	velocity = direction * speed
-	var dirAdj = velocity.normalized()
+func _physics_process(delta):
+	#dprint(str(velocity.x) + " abs " + str(abs(velocity.x)) + " -abs: " + str(-abs(velocity.x)))
+	var decel = Vector2(-sign(velocity.x), -sign(velocity.y)) * decelSpeed * delta
+	#print(str(velocity) + " " + str(velocity.length()) + " decel " + str(decel))
+	var check = velocity + decel
+	if check.length() < 20:
+		velocity = Vector2.ZERO
+	else:
+		velocity += decel
+	if staggerCounter - delta * staggerDelta > 0:
+		staggerCounter -= delta * staggerDelta
+	else:
+		stagger(false)
+	if !staggered:
+		var direction = Input.get_vector("left", "right", "up", "down")
+		velocity += direction * speed * delta
+	
+	var power = min(velocity.length() / highVelocity, 500)
 	move_and_slide()
 	if global_position != prePos:
 		#print("moved")
 		GM.occludeChunks(self)
 	prePos = global_position
 	#slideCollision()
-	var newCollides := {}
 	var colCount = get_slide_collision_count()
 	for i in colCount:
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
 		if collider is TileMapLayer:
-			GM.playerDie(self)
-			"""
-			#var colDir = collision.get_position() - position
-			var colPos = collision.get_position()
-			#var dirAdj = velocity.normalized()#colDir.normalized * 20
-			var tilePos = collider.local_to_map(colPos + dirAdj)
-			# add chunk id later on
-			newCollides[tilePos] = true
-			if not curCollides.has(tilePos):
-				collider.receiveCollision(tilePos)
-			curCollides = newCollides
-			"""
-	"""
-	var shape = $CollisionShape2D.shape
-	var topLeft = map.local_to_map(global_position - shape.extents)
-	var botRight = map.local_to_map(global_position + shape.extents)
+			crash(collision, power)
+			#GM.playerDie(self)
 
-	var dir = velocity.normalized()
-	if dir.x != 0 or dir.y != 0:
-		print("pos: " + str(global_position))
-		print("physics " + str(map.local_to_map(global_position)))
-		print("TL: " + str(topLeft) + " BR: " + str(botRight))
-		for x in range(topLeft.x, botRight.x+1):
-			for y in range(topLeft.y, botRight.y+1):
-				var pos = Vector2i(round(x), round(y))
-				dir = Vector2i(velocity.normalized().x, velocity.normalized().y)
-				var fin = pos + dir
-				fin = Vector2i(round(fin.x), round(fin.y))
-				print(str(pos) + " + " + str(dir) + " " + str(fin))
-				#map.receiveCollision(pos)
-	"""
+func crash(col: KinematicCollision2D, power: float):
+	if power < landingPower:
+		return
+	#print("hit at " + str(global_position) + " form " + str(col.get_position()))
+	#print(str(velocity.length()) + " / " + str(highVelocity) + " = " + str(power))
+	if health > 0:
+		var blast = global_position - col.get_position()
+		var energy: Vector2 = blast * crashPower * power
+		if energy.length() < 10000:
+			velocity = energy
+			decelSpeed = crashDecel
+		stagger(true)
+	else:
+		GM.playerDie(self)
+	health -= 1
+
+func stagger(stagged: bool):
+	if stagged:
+		staggerCounter = staggerPower
+		staggered = true
+	else:
+		staggerCounter = 0
+		staggered = false
+		decelSpeed = baseDecel

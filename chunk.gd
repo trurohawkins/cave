@@ -13,9 +13,9 @@ TileSetAtlasSource.TRANSFORM_TRANSPOSE | TileSetAtlasSource.TRANSFORM_FLIP_H,
 var gridPos
 
 func _ready():
-	modulate = Color(0.2,0.1,0.3)
+	#dmodulate = Color(0.2,0.1,0.3)
 	#modulate = Color(1, 1, 1)
-	#modulate = Color(randf(), randf(), randf(), 1)
+	modulate = Color(randf(), randf(), randf(), 1)
 	#set_cell(Vector2i(1,1), -1)
 
 
