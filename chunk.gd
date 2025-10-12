@@ -13,8 +13,9 @@ TileSetAtlasSource.TRANSFORM_TRANSPOSE | TileSetAtlasSource.TRANSFORM_FLIP_H,
 var gridPos
 
 func _ready():
-	#modulate = Color(0.2,0.1,0.3)
-	modulate = Color(randf(), randf(), randf(), 1)
+	modulate = Color(0.2,0.1,0.3)
+	#modulate = Color(1, 1, 1)
+	#modulate = Color(randf(), randf(), randf(), 1)
 	#set_cell(Vector2i(1,1), -1)
 
 
@@ -32,7 +33,7 @@ func hollowCenter(chasm: int):
 			set_cell(Vector2i(xp, yp), -1)
 
 func tileChunk():
-	print(neighbors)
+	#print(neighbors)
 	for x in range(chunkSize):
 		for y in range(chunkSize):
 			tileBlock(x, y)
@@ -95,8 +96,8 @@ func tileBlock(x: int, y: int):
 			if corners > mostCorn:
 				mostCorn = corners
 				check = i
-		if x == 2 && y == 2:
-			print(mostCorn)
+		#if x == 2 && y == 2:
+			#print(mostCorn)
 		if mostCorn != 0:
 			mostOpen = 6 + (mostCorn-1)
 			startSide = check
@@ -148,7 +149,7 @@ func getCell(pos):
 func receiveCollision(pos: Vector2i):
 	pos.x -= gridPos.x * chunkSize
 	pos.y -= gridPos.y * chunkSize
-	print("tile map collided with " + str(pos))
+	#print("tile map collided with " + str(pos))
 	set_cell(pos, -1)
 	for x in range(-1, 2):
 		for y in range(-1, 2):

@@ -52,7 +52,7 @@ func spawnMap():
 			var cur = grid[x][y]
 			cur.tileChunk()
 			#print(cur.neighbors)
-	#spawnPoint = Vector2((mapSize.x / 2 * chunkSize.x + chunkSize.x/2) * 32, (mapSize.y / 2 * chunkSize.y + chunkSize.y/2) * 32)
+	spawnPoint = Vector2((mapSize.x / 2 * chunkSize.x + chunkSize.x/2) * 32, (mapSize.y / 2 * chunkSize.y + chunkSize.y/2) * 32)
 				
 func addNeighbor(chunk, x, y):
 	var xp = chunk.gridPos.x + x
@@ -85,9 +85,10 @@ func occludeChunks(player: CharacterBody2D):
 	#spawnPoint = Vector2((mapSize.x / 2 * chunkSize.x + chunkSize.x/2) * 32, (mapSize.y / 2 * chunkSize.y + chunkSize.y/2) * 32)
 	var px = int(player.global_position.x / 32 / chunkSize.x)
 	var py = int(player.global_position.y / 32 / chunkSize.y)
-	print(str(px) + ", " + str(py))
+	#print(str(px) + ", " + str(py))
 	for x in mapSize.x:
 		for y in mapSize.y:
 			var dist = max(abs(x - px), abs(y - py))
-			print(str(x) + ", " + str(y) + " " + str(dist))
-			grid[x][y].occlude(dist > 1)
+			#print(str(x) + ", " + str(y) + " " + str(dist))
+			#1 for square, figure out aspect ratio and do it per x and y
+			grid[x][y].occlude(dist > 2)

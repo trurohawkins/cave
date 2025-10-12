@@ -5,7 +5,7 @@ extends Area2D
 var lifeDelta = 10
 
 func _ready():
-	print("ready")
+	pass
 
 func _process(delta):
 	position += Vector2.RIGHT.rotated(rotation) * speed * delta
@@ -18,7 +18,6 @@ func _on_body_entered(body):
 func getCollsions(map):
 	var shape = $CollisionShape2D.shape
 	var square = Vector2(shape.radius * scale.x, shape.radius * scale.y)
-	print(shape.radius)
 	var topLeft = map.local_to_map(global_position - square)
 	var botRight = map.local_to_map(global_position + square)
 

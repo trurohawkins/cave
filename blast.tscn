@@ -8,8 +8,8 @@
 [node name="blast" type="Area2D"]
 scale = Vector2(10, 10)
 script = ExtResource("1_l5868")
-speed = 400.0
-hitCost = 0.0
+speed = 1000.0
+hitCost = 0.05
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_l5868")
