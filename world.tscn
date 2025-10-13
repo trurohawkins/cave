@@ -1,18 +1,14 @@
-[gd_scene load_steps=5 format=3 uid="uid://buddmvvh18voa"]
+[gd_scene load_steps=4 format=3 uid="uid://buddmvvh18voa"]
 
 [ext_resource type="Script" uid="uid://bnmc75io2k5ca" path="res://GM.gd" id="1_aqk2v"]
 [ext_resource type="PackedScene" uid="uid://c5jp5rmk0hlc4" path="res://chunk.tscn" id="3_aqk2v"]
 [ext_resource type="PackedScene" uid="uid://dur2pvkhlv1eq" path="res://player.tscn" id="3_tlwt5"]
-[ext_resource type="Texture2D" uid="uid://clbhg28hpiuff" path="res://pizza.png" id="4_aqk2v"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_aqk2v")
 playerScene = ExtResource("3_tlwt5")
 chunkScene = ExtResource("3_aqk2v")
-mapSize = Vector2i(1, 1)
-chunkSize = Vector2i(500, 500)
+mapSize = Vector2i(3, 3)
+chunkSize = Vector2i(100, 100)
 spawnPoint = Vector2(200, -500)
 respawnRate = 1
-
-[node name="Pizza" type="Sprite2D" parent="."]
-texture = ExtResource("4_aqk2v")

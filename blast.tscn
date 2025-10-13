@@ -9,9 +9,9 @@
 modulate = Color(1, 0.20392157, 0.12156863, 0.24313726)
 scale = Vector2(10, 10)
 script = ExtResource("1_l5868")
-speed = 10.0
-power = 200.0
-hitCost = 0.2
+speed = 20.0
+power = 50.0
+hitCost = 0.01
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_l5868")

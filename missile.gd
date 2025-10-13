@@ -6,9 +6,10 @@ extends CharacterBody2D
 
 @export var blastScene: PackedScene
 var lifeDelta = 10
+var GM: Node2D
 
 func _ready():
-	velocity = Vector2.RIGHT.rotated(rotation) * speed
+	velocity += Vector2.RIGHT.rotated(rotation) * speed
 
 func _process(delta):
 	losePower(delta * lifeDelta)
@@ -30,6 +31,7 @@ func _process(delta):
 func blowUp():
 	queue_free()
 	var blast = blastScene.instantiate()
+	blast.GM = GM
 	blast.global_position = global_position
 	get_tree().get_current_scene().add_child(blast)
 

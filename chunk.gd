@@ -146,10 +146,12 @@ func getCell(pos):
 					#print("got " + str(block) + " from pos " + str(pos))
 	return TYPE_NIL
 	
-func receiveCollision(pos: Vector2i):
-	pos.x -= gridPos.x * chunkSize
-	pos.y -= gridPos.y * chunkSize
-	#print("tile map collided with " + str(pos))
+func receiveCollision(pos: Vector2i, preCalc: bool):
+	#print("tile map " + str(gridPos) + " collided with " + str(pos))
+	if not preCalc:
+		pos.x -= gridPos.x * chunkSize
+		pos.y -= gridPos.y * chunkSize
+
 	set_cell(pos, -1)
 	for x in range(-1, 2):
 		for y in range(-1, 2):

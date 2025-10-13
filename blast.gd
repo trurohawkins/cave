@@ -1,48 +1,59 @@
 extends Area2D
+@export var startSize = 10
+@export var endSize = 60
 @export var speed: float = 50
 @export var power: float = 100
 @export var hitCost: float = 5
-var lifeDelta = 10
+var lifeDelta = 30
 @onready var sprite = $Sprite2D
+@onready var circle = $CollisionShape2D.shape
 var hit = []
+var GM: Node2D
 
 func _ready():
-	pass
+	circle.radius = startSize
 
 func _process(delta):
 	#position += Vector2.RIGHT.rotated(rotation) * speed * delta
-	var circle = $CollisionShape2D.shape
-	circle.radius += speed * delta
-	if sprite.scale.x < 4:
-		sprite.scale.x += speed/2 * delta
-		sprite.scale.y += speed/2 * delta
-	losePower(delta * lifeDelta)
+	#print(circle.radius)
+	if circle.radius + speed * delta < endSize:
+		circle.radius += speed * delta
+	else:
+		queue_free()
+	if sprite.scale.x < 4.5:
+		sprite.scale.x += speed/2.5 * delta
+		sprite.scale.y += speed/2.5 * delta
 
 func _on_body_entered(body):
 	if body is TileMapLayer:
-		getCollsions(body)
+		getCollisions()
 
-func getCollsions(map):
+func getCollisions():
 	var shape = $CollisionShape2D.shape
 	var square = Vector2(shape.radius * scale.x, shape.radius * scale.y)
+	"""
 	var topLeft = map.local_to_map(global_position - square)
 	var botRight = map.local_to_map(global_position + square)
+	"""
+	var topLeft = (global_position - square) / 32
+	var botRight = (global_position + square) / 32
 
-	#print("pos: " + str(global_position))
-	#print("physics " + str(map.local_to_map(global_position)))
-	#print("TL: " + str(topLeft) + " BR: " + str(botRight))
 	for x in range(topLeft.x, botRight.x+1):
 		for y in range(topLeft.y, botRight.y+1):
 			var pos = Vector2i(round(x), round(y))
-			if pos.distance_to(map.local_to_map(global_position)) < 15 + randi_range(0, 4):
-				var poo = [pos, map]
-				if pos not in hit:
-					hit.append(pos)
+			if pos.distance_to(global_position/32) < square.x/32 + randi_range(0, 4):
+				var mc = GM.posToChunk(pos)
+				if mc not in hit:
+					#print(str(pos) + " " + str(power))
+					hit.append(mc)
 					if power > 0:
-						map.receiveCollision(pos)
+						#mc[0].receiveCollision(mc[1])
+						GM.checkCollision(mc)
 						losePower(hitCost)
 					else:
 						break
+		if power <= 0:
+			break
 			#dir = Vector2i(velocity.normalized().x, velocity.normalized().y)
 			#var fin = pos + dir
 			#fin = Vector2i(round(fin.x), round(fin.y))
@@ -54,5 +65,7 @@ func getCollsions(map):
 func losePower(amnt: float):
 	if power - amnt > 0:
 		power -= amnt
-	else:
+	elif power != 0:
+		power = 0
+		print("dead at " + str(circle.radius))
 		queue_free()

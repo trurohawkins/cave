@@ -5,8 +5,11 @@ var coolDelta: float = 10
 var coolTimer: float = 0
 var shooting: bool = false
 @export var bulletScene: PackedScene
+@export var player: CharacterBody2D
 
 @onready var spawnPoint = $barrel/muzzle
+var GM: Node2D
+
 
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -29,6 +32,8 @@ func spawnBullet():
 	if bulletScene and coolTimer <= 0:
 		coolTimer = coolDown
 		var bullet = bulletScene.instantiate()
+		bullet.GM = GM
 		bullet.global_position = spawnPoint.global_position
 		bullet.global_rotation = spawnPoint.global_rotation
+		bullet.velocity = player.velocity / 2
 		get_tree().current_scene.add_child(bullet)

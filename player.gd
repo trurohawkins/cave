@@ -9,6 +9,13 @@ var decelSpeed: float = 0.5
 @export var landingPower: float = 0.5
 
 @export var staggerPower: float = 50
+@export var camRot: float = 0.1
+@export var gravPower = 1000
+@export var maxGrav = 2000
+var curGrav = 0
+@onready var gun = $gun
+@onready var cam = $Camera2D
+
 var staggerDelta: float = 10
 var staggerCounter: float = 0
 var staggered: bool = false
@@ -19,8 +26,14 @@ var curCollides := {}
 
 func _ready():
 	decelSpeed = baseDecel
-
+	cam.ignore_rotation = false
+	
+func receiveGM(gm):
+	GM = gm
+	gun.GM = gm
+	
 func _physics_process(delta):
+
 	#dprint(str(velocity.x) + " abs " + str(abs(velocity.x)) + " -abs: " + str(-abs(velocity.x)))
 	var decel = Vector2(-sign(velocity.x), -sign(velocity.y)) * decelSpeed * delta
 	#print(str(velocity) + " " + str(velocity.length()) + " decel " + str(decel))
@@ -35,9 +48,17 @@ func _physics_process(delta):
 		stagger(false)
 	if !staggered:
 		var direction = Input.get_vector("left", "right", "up", "down")
-		velocity += direction * speed * delta
-	
+		if direction != Vector2.ZERO:
+			direction = direction.rotated(cam.rotation)
+			velocity += direction * speed * delta
+			curGrav = 0
+		else:
+			if curGrav + gravPower < maxGrav:
+				curGrav += gravPower
+			else:
+				curGrav = maxGrav
 	var power = min(velocity.length() / highVelocity, 500)
+	camGrav(delta)
 	move_and_slide()
 	if global_position != prePos:
 		#print("moved")
@@ -76,3 +97,9 @@ func stagger(stagged: bool):
 		staggerCounter = 0
 		staggered = false
 		decelSpeed = baseDecel
+		
+func camGrav(delta):
+	cam.rotation_degrees += camRot * delta
+	var grav = Vector2.DOWN.rotated(cam.rotation)
+	#if !boosting:
+	velocity += grav * delta * curGrav
