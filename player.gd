@@ -1,6 +1,8 @@
 extends CharacterBody2D
-@export var health: int = 5
+@export var energy: float = 5
+var energyMax
 @export var speed: int = 200
+@export var thrustCost: float = 0.1
 @export var baseDecel: float = 0.5
 var decelSpeed: float = 0.5
 @export var crashPower: float = 10
@@ -29,14 +31,24 @@ var invincible: bool = false
 var GM: Node2D
 var prePos = Vector2(-1, -1)
 var curCollides := {}
+var energyBar: ProgressBar
+
+var rechargePause: float = 1
+var rPauseTimer = 0
+var rechargeSpeed: float = 3#0.2
+
 
 func _ready():
 	decelSpeed = baseDecel
 	cam.ignore_rotation = false
+	energyMax = energy
 	
 func receiveGM(gm):
 	GM = gm
 	gun.GM = gm
+	energyBar = GM.energyBar
+	energyBar.value = energy
+	energyBar.max_value = energyMax
 	
 func _physics_process(delta):
 
@@ -58,10 +70,11 @@ func _physics_process(delta):
 		invulnerate(false)
 	if !staggered:
 		var direction = Input.get_vector("left", "right", "up", "down")
-		if direction != Vector2.ZERO:
+		if direction != Vector2.ZERO && energy > thrustCost:
 			direction = direction.rotated(cam.rotation)
 			velocity += direction * speed * delta
 			curGrav = 0
+			changeEnergy(-thrustCost, true)
 		else:
 			if curGrav + gravPower < maxGrav:
 				curGrav += gravPower
@@ -82,27 +95,52 @@ func _physics_process(delta):
 		if collider is TileMapLayer:
 			crash(collision.get_position(), power)
 			#GM.playerDie(self)
+	if rPauseTimer - delta > 0:
+		#print(rPauseTimer)
+		rPauseTimer -= delta
+	else:
+		rPauseTimer = 0
+		if energy < energyMax:
+			#print("charging " + str(rechargeSpeed * delta) + " " + str(energy))
+			changeEnergy(rechargeSpeed * delta, false)
+		
 
 func crash(pos: Vector2, power: float):
 	if power < landingPower:
 		return
 	if !invincible:
-		#invulnerate(true)
+		invulnerate(true)
 		blowUp()
 		#print("hit at " + str(global_position) + " form " + str(col.get_position()))
 		#print(str(velocity.length()) + " / " + str(highVelocity) + " = " + str(power))
-		if health > 0:
+		if energy > 0:
+			changeEnergy(-10, true)
 			blasted(pos, power)
 		else:
 			GM.playerDie(self)
-		health -= 1
+
+func changeEnergy(amnt: float, pause: bool):
+	if amnt == 0:
+		return
+	if amnt > 0:
+		if energy + amnt < energyMax:
+			energy += amnt
+		else:
+			energy = energyMax
+	else:
+		if energy + amnt > 0:
+			energy += amnt
+		else:
+			energy = 0
+	if pause:
+		rPauseTimer = rechargePause
+	energyBar.changeValue(energy)
 
 func blasted(pos, power):
 	var blast = global_position - pos
-	var energy: Vector2 = blast * crashPower * power
-	print("blasted " + str(power) + " " + str(energy))
-	if energy.length() < 10000:
-		velocity += energy
+	var blastPower: Vector2 = blast * crashPower * power
+	if blastPower.length() < 10000:
+		velocity += blastPower
 		decelSpeed = crashDecel
 	stagger(true)
 	
@@ -137,3 +175,4 @@ func blowUp():
 	blast.lifeTime = 5
 	blast.global_position = global_position
 	get_tree().get_current_scene().add_child(blast)
+	

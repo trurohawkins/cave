@@ -11,8 +11,9 @@
 scale = Vector2(5, 5)
 collision_layer = 2
 script = ExtResource("1_onrkg")
-health = 2
+energy = 30.0
 speed = 1500
+thrustCost = 0.0
 crashDecel = 10.0
 landingPower = 0.3
 staggerPower = 0.0

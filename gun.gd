@@ -6,7 +6,7 @@ var coolTimer: float = 0
 var shooting: bool = false
 @export var bulletScene: PackedScene
 @export var player: CharacterBody2D
-
+@export var shotCost: float = 5
 @onready var spawnPoint = $barrel/muzzle
 var GM: Node2D
 
@@ -29,7 +29,8 @@ func _process(delta):
 		spawnBullet()
 
 func spawnBullet():
-	if bulletScene and coolTimer <= 0:
+	if bulletScene and coolTimer <= 0 && player.energy > shotCost:
+		player.changeEnergy(-shotCost, true)
 		coolTimer = coolDown
 		var bullet = bulletScene.instantiate()
 		bullet.GM = GM

@@ -8,6 +8,8 @@ var size: Vector2
 
 @export var spawnPoint: Vector2
 @export var respawnRate = 100
+@export var energyBar: ProgressBar
+
 var respawnCounter = 0
 var shaders = []
 
@@ -77,7 +79,7 @@ func shapeMap():
 	"""
 	makeHole(center, size.x/2, size.x/5, true, false)
 
-	var tunnels = clamp(randi(), 15, 25)
+	var tunnels = 50#clamp(randi(), 35, 35)
 	for i in range(tunnels):
 		tunnel()
 	spawnPoint = center * 32
@@ -87,12 +89,12 @@ func shapeMap():
 
 func tunnel():
 	var center = Vector2(size.x/2, size.y/2)
-	var chasm = 10
+	var chasm = 5
 	var move = 20
 	var dither = 5
-	var m: int = size.x - 20
+	var m: int = size.x -30
 	var pos = Vector2(randi()%m, randi()%m)
-	var length = clamp(randi(), 5, 30)
+	var length = clamp(randi(), 5, 10)
 	for i in range(length):
 		if pos.distance_to(center) < size.x/2 - chasm - 75:
 			makeHole(pos, chasm, 0, false, false)
