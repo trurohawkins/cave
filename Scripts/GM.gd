@@ -8,7 +8,7 @@ var size: Vector2
 
 @export var spawnPoint: Vector2
 @export var respawnRate = 100
-@export var energyBar: ProgressBar
+@onready var BG = $DarkCaveBg
 
 var respawnCounter = 0
 var shaders = []
@@ -20,6 +20,7 @@ func _ready():
 
 func spawnMap():
 	size = Vector2(mapSize.x * chunkSize.x, mapSize.y * chunkSize.y)
+	shaders.append(BG.material)
 	for chunkX in range(mapSize.x):
 		var col = []
 		for chunkY in range(mapSize.y):
@@ -198,11 +199,17 @@ func checkCollision(mc):
 		#print("chunk: " + str(mc[0]) + " pos: " + str(map))
 		chunk.receiveCollision(map, true)
 	
+var winner: bool = false	
+
 func occludeChunks(player: CharacterBody2D):
 	#var mc = posToChunk(player.global_position)
 	#spawnPoint = Vector2((mapSize.x / 2 * chunkSize.x + chunkSize.x/2) * 32, (mapSize.y / 2 * chunkSize.y + chunkSize.y/2) * 32)
-	if player.global_position.x < 0 || player.global_position.y < 0 || player.global_position.x > chunkSize.x * mapSize.x * 32 || player.global_position.y > chunkSize.y * mapSize.y * 32:
-		print("player has reached freedom!")
+	if !winner:
+		if player.global_position.x < 0 || player.global_position.y < 0 || player.global_position.x > chunkSize.x * mapSize.x * 32 || player.global_position.y > chunkSize.y * mapSize.y * 32:
+			winner = true
+			print("player has reached freedom!")
+			for s in shaders:
+				s.set_shader_parameter("lightRadius", 5000.0)
 	var px = int(player.global_position.x / 32 / chunkSize.x)
 	var py = int(player.global_position.y / 32 / chunkSize.y)
 	for x in mapSize.x:

@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://c8i78vpf02m1f"]
 
-[ext_resource type="Script" uid="uid://ch1v7xi0j4nel" path="res://missile.gd" id="1_0uoyr"]
-[ext_resource type="Texture2D" uid="uid://clbhg28hpiuff" path="res://pizza.png" id="2_11vnk"]
-[ext_resource type="PackedScene" uid="uid://i17p6qyg72js" path="res://blast.tscn" id="2_bqn2q"]
+[ext_resource type="Script" uid="uid://ch1v7xi0j4nel" path="res://Scripts/missile.gd" id="1_0uoyr"]
+[ext_resource type="Texture2D" uid="uid://clbhg28hpiuff" path="res://Sprites/pizza.png" id="2_11vnk"]
+[ext_resource type="PackedScene" uid="uid://i17p6qyg72js" path="res://Scene/blast.tscn" id="2_bqn2q"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bqn2q"]
 

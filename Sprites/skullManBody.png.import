@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cuuljqsrp7a2c"
-path="res://.godot/imported/gun.png-14d3fc499b0981d713f67d163509aeff.ctex"
+uid="uid://bnvkaukpj2qwn"
+path="res://.godot/imported/skullManBody.png-4d0c39ca6dc528ccecae748f6370e577.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://gun.png"
-dest_files=["res://.godot/imported/gun.png-14d3fc499b0981d713f67d163509aeff.ctex"]
+source_file="res://Sprites/skullManBody.png"
+dest_files=["res://.godot/imported/skullManBody.png-4d0c39ca6dc528ccecae748f6370e577.ctex"]
 
 [params]
 

@@ -19,6 +19,8 @@ var decelSpeed: float = 0.5
 var curGrav = 0
 @onready var gun = $gun
 @onready var cam = $Camera2D
+@onready var energySprite = $deetSprite
+@onready var handEnergySprite = $gun/hand/deet
 
 var staggerDelta: float = 10
 var staggerCounter: float = 0
@@ -31,7 +33,6 @@ var invincible: bool = false
 var GM: Node2D
 var prePos = Vector2(-1, -1)
 var curCollides := {}
-var energyBar: ProgressBar
 
 var rechargePause: float = 1
 var rPauseTimer = 0
@@ -42,13 +43,12 @@ func _ready():
 	decelSpeed = baseDecel
 	cam.ignore_rotation = false
 	energyMax = energy
+	energySprite.material.set_shader_parameter("desaturation", 1.0 - (energy/energyMax))
+	handEnergySprite.material.set_shader_parameter("desaturation", 1.0 - (energy/energyMax))
 	
 func receiveGM(gm):
 	GM = gm
 	gun.GM = gm
-	energyBar = GM.energyBar
-	energyBar.value = energy
-	energyBar.max_value = energyMax
 	
 func _physics_process(delta):
 
@@ -69,12 +69,12 @@ func _physics_process(delta):
 	else:
 		invulnerate(false)
 	if !staggered:
-		var direction = Input.get_vector("left", "right", "up", "down")
-		if direction != Vector2.ZERO && energy > thrustCost:
+		var direction = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+		if direction != Vector2.ZERO && energy > thrustCost * delta:
 			direction = direction.rotated(cam.rotation)
 			velocity += direction * speed * delta
 			curGrav = 0
-			changeEnergy(-thrustCost, true)
+			changeEnergy(-thrustCost * delta, true)
 		else:
 			if curGrav + gravPower < maxGrav:
 				curGrav += gravPower
@@ -134,7 +134,8 @@ func changeEnergy(amnt: float, pause: bool):
 			energy = 0
 	if pause:
 		rPauseTimer = rechargePause
-	energyBar.changeValue(energy)
+	energySprite.material.set_shader_parameter("desaturation", 1.0 - (energy/energyMax))
+	handEnergySprite.material.set_shader_parameter("desaturation", 1.0 - (energy/energyMax))
 
 func blasted(pos, power):
 	var blast = global_position - pos

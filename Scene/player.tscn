@@ -1,0 +1,48 @@
+[gd_scene load_steps=9 format=3 uid="uid://dur2pvkhlv1eq"]
+
+[ext_resource type="Script" uid="uid://d10y87l7bijlt" path="res://Scripts/player.gd" id="1_r6jsd"]
+[ext_resource type="PackedScene" uid="uid://i17p6qyg72js" path="res://Scene/blast.tscn" id="2_p6qlh"]
+[ext_resource type="PackedScene" uid="uid://plw4uxg427gw" path="res://Scene/gun.tscn" id="3_2sw5t"]
+[ext_resource type="Texture2D" uid="uid://bnvkaukpj2qwn" path="res://Sprites/skullManBody.png" id="4_ij4jb"]
+[ext_resource type="Shader" uid="uid://ckqteutove7gn" path="res://Scripts/desaturate.gdshader" id="5_c68nv"]
+[ext_resource type="Texture2D" uid="uid://crpnhxgdk681y" path="res://Sprites/skullManFeatures.png" id="6_c31lq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_036b0"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dw050"]
+shader = ExtResource("5_c68nv")
+shader_parameter/desaturation = 0.0
+
+[node name="Player" type="CharacterBody2D"]
+scale = Vector2(6, 6)
+collision_layer = 2
+script = ExtResource("1_r6jsd")
+energy = 30.0
+speed = 1500
+crashDecel = 10.0
+landingPower = 0.3
+staggerPower = 0.0
+invincibleTime = 5.0
+camRot = 0.5
+gravPower = 50
+maxGrav = 1400
+blastScene = ExtResource("2_p6qlh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_036b0")
+
+[node name="gun" parent="." node_paths=PackedStringArray("player") instance=ExtResource("3_2sw5t")]
+scale = Vector2(0.5, 0.5)
+player = NodePath("..")
+
+[node name="bodySprite" type="Sprite2D" parent="."]
+scale = Vector2(0.61999995, 0.61999995)
+texture = ExtResource("4_ij4jb")
+
+[node name="deetSprite" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_dw050")
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("6_c31lq")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(0.3, 0.3)

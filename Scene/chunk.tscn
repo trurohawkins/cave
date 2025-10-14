@@ -1,8 +1,8 @@
 [gd_scene load_steps=7 format=3 uid="uid://c5jp5rmk0hlc4"]
 
-[ext_resource type="Shader" uid="uid://bdvmpay2ytrjf" path="res://chunkTiles.gdshader" id="1_a0kup"]
-[ext_resource type="Texture2D" uid="uid://l4fs7ppxdder" path="res://dirtTileSheet.png" id="1_eat54"]
-[ext_resource type="Script" uid="uid://cpvevkkr840in" path="res://chunk.gd" id="2_a0kup"]
+[ext_resource type="Shader" uid="uid://bdvmpay2ytrjf" path="res://Scripts/chunkTiles.gdshader" id="1_a0kup"]
+[ext_resource type="Texture2D" uid="uid://l4fs7ppxdder" path="res://Sprites/dirtTileSheet.png" id="1_eat54"]
+[ext_resource type="Script" uid="uid://cpvevkkr840in" path="res://Scripts/chunk.gd" id="2_a0kup"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_a0kup"]
 shader = ExtResource("1_a0kup")

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://l4fs7ppxdder"
-path="res://.godot/imported/dirtTileSheet.png-71ad2198b2073163431554cae8715d03.ctex"
+uid="uid://dffqrts78nikr"
+path="res://.godot/imported/darkCaveBG.png-61ace806b34bf62bd0c186b5f85e97cd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://dirtTileSheet.png"
-dest_files=["res://.godot/imported/dirtTileSheet.png-71ad2198b2073163431554cae8715d03.ctex"]
+source_file="res://Sprites/darkCaveBG.png"
+dest_files=["res://.godot/imported/darkCaveBG.png-61ace806b34bf62bd0c186b5f85e97cd.ctex"]
 
 [params]
 

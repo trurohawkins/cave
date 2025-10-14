@@ -1,0 +1,26 @@
+[gd_scene load_steps=7 format=3 uid="uid://plw4uxg427gw"]
+
+[ext_resource type="Script" uid="uid://biq0aep5oqjb8" path="res://Scripts/gun.gd" id="1_dk5gl"]
+[ext_resource type="PackedScene" uid="uid://c8i78vpf02m1f" path="res://Scene/missile.tscn" id="2_8iju2"]
+[ext_resource type="Texture2D" uid="uid://cxfnvcd2nfukk" path="res://Sprites/skullHand.png" id="3_ikln6"]
+[ext_resource type="Shader" uid="uid://ckqteutove7gn" path="res://Scripts/desaturate.gdshader" id="4_5twiu"]
+[ext_resource type="Texture2D" uid="uid://bwftjug6ctomb" path="res://Sprites/skullHandDeet.png" id="4_hdwo7"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4oyk7"]
+shader = ExtResource("4_5twiu")
+shader_parameter/desaturation = 0.0
+
+[node name="Gun" type="Node2D"]
+script = ExtResource("1_dk5gl")
+bulletScene = ExtResource("2_8iju2")
+
+[node name="hand" type="Sprite2D" parent="."]
+position = Vector2(35, 0)
+texture = ExtResource("3_ikln6")
+
+[node name="deet" type="Sprite2D" parent="hand"]
+material = SubResource("ShaderMaterial_4oyk7")
+texture = ExtResource("4_hdwo7")
+
+[node name="muzzle" type="Marker2D" parent="hand"]
+position = Vector2(7, 0)

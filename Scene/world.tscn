@@ -1,0 +1,27 @@
+[gd_scene load_steps=7 format=3 uid="uid://buddmvvh18voa"]
+
+[ext_resource type="Script" uid="uid://bnmc75io2k5ca" path="res://Scripts/GM.gd" id="1_aqk2v"]
+[ext_resource type="PackedScene" uid="uid://c5jp5rmk0hlc4" path="res://Scene/chunk.tscn" id="3_aqk2v"]
+[ext_resource type="PackedScene" uid="uid://dur2pvkhlv1eq" path="res://Scene/player.tscn" id="3_tlwt5"]
+[ext_resource type="Shader" uid="uid://bdvmpay2ytrjf" path="res://Scripts/chunkTiles.gdshader" id="4_pcvp0"]
+[ext_resource type="Texture2D" uid="uid://dffqrts78nikr" path="res://Sprites/darkCaveBG.png" id="4_scul4"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_37axr"]
+shader = ExtResource("4_pcvp0")
+shader_parameter/lightPos = Vector2(450, 230)
+shader_parameter/lightRadius = 300.0
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_aqk2v")
+playerScene = ExtResource("3_tlwt5")
+chunkScene = ExtResource("3_aqk2v")
+mapSize = Vector2i(1, 1)
+chunkSize = Vector2i(300, 300)
+spawnPoint = Vector2(200, -500)
+respawnRate = 1
+
+[node name="DarkCaveBg" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_37axr")
+position = Vector2(5414.0005, 5541.0005)
+scale = Vector2(12, 12)
+texture = ExtResource("4_scul4")

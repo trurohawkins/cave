@@ -26,7 +26,7 @@ func _process(delta):
 	if circle.radius + speed * delta < endSize:
 		circle.radius += speed * delta
 	else:
-		print("dead at " + str(circle.radius))
+		#print("dead at " + str(circle.radius))
 		queue_free()
 	if sprite.scale.x < endSize/15:
 		sprite.scale.x += speed/2.5 * delta
