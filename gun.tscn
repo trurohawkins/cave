@@ -13,4 +13,4 @@ bulletScene = ExtResource("2_8iju2")
 texture = ExtResource("2_kw0bs")
 
 [node name="muzzle" type="Marker2D" parent="barrel"]
-position = Vector2(40, 0)
+position = Vector2(48, 0)

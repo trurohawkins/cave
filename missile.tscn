@@ -9,7 +9,6 @@
 [node name="missile" type="CharacterBody2D"]
 scale = Vector2(5, 5)
 collision_layer = 2
-collision_mask = 3
 script = ExtResource("1_0uoyr")
 speed = 2000.0
 blastScene = ExtResource("2_bqn2q")

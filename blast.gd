@@ -4,11 +4,13 @@ extends Area2D
 @export var speed: float = 50
 @export var power: float = 100
 @export var hitCost: float = 5
+@export var lifeTime: float = 100
 var lifeDelta = 30
 @onready var sprite = $Sprite2D
 @onready var circle = $CollisionShape2D.shape
 var hit = []
 var GM: Node2D
+var blastPower = 0.5
 
 func _ready():
 	circle.radius = startSize
@@ -16,17 +18,26 @@ func _ready():
 func _process(delta):
 	#position += Vector2.RIGHT.rotated(rotation) * speed * delta
 	#print(circle.radius)
+	if lifeTime - delta > 0:
+		lifeTime -= delta
+	else:
+		pass
+		#queue_free()
 	if circle.radius + speed * delta < endSize:
 		circle.radius += speed * delta
 	else:
+		print("dead at " + str(circle.radius))
 		queue_free()
-	if sprite.scale.x < 4.5:
+	if sprite.scale.x < endSize/15:
 		sprite.scale.x += speed/2.5 * delta
 		sprite.scale.y += speed/2.5 * delta
 
 func _on_body_entered(body):
 	if body is TileMapLayer:
 		getCollisions()
+	else:
+		if body.has_method("blasted"):
+			body.blasted(global_position, blastPower)
 
 func getCollisions():
 	var shape = $CollisionShape2D.shape

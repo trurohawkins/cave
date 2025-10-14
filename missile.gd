@@ -10,6 +10,7 @@ var GM: Node2D
 
 func _ready():
 	velocity += Vector2.RIGHT.rotated(rotation) * speed
+	#print("missile fired at " + str(velocity))
 
 func _process(delta):
 	losePower(delta * lifeDelta)

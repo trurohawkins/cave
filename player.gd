@@ -9,9 +9,11 @@ var decelSpeed: float = 0.5
 @export var landingPower: float = 0.5
 
 @export var staggerPower: float = 50
+@export var invincibleTime: float = 20
 @export var camRot: float = 0.1
 @export var gravPower = 1000
 @export var maxGrav = 2000
+@export var blastScene: PackedScene
 var curGrav = 0
 @onready var gun = $gun
 @onready var cam = $Camera2D
@@ -19,6 +21,10 @@ var curGrav = 0
 var staggerDelta: float = 10
 var staggerCounter: float = 0
 var staggered: bool = false
+
+var invicinbleDelta: float = 10
+var invincibleCounter: float = 0
+var invincible: bool = false
 
 var GM: Node2D
 var prePos = Vector2(-1, -1)
@@ -46,6 +52,10 @@ func _physics_process(delta):
 		staggerCounter -= delta * staggerDelta
 	else:
 		stagger(false)
+	if invincibleCounter - delta * invicinbleDelta > 0:
+		invincibleCounter -= delta * invicinbleDelta
+	else:
+		invulnerate(false)
 	if !staggered:
 		var direction = Input.get_vector("left", "right", "up", "down")
 		if direction != Vector2.ZERO:
@@ -70,25 +80,32 @@ func _physics_process(delta):
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
 		if collider is TileMapLayer:
-			crash(collision, power)
+			crash(collision.get_position(), power)
 			#GM.playerDie(self)
 
-func crash(col: KinematicCollision2D, power: float):
+func crash(pos: Vector2, power: float):
 	if power < landingPower:
 		return
-	#print("hit at " + str(global_position) + " form " + str(col.get_position()))
-	#print(str(velocity.length()) + " / " + str(highVelocity) + " = " + str(power))
-	if health > 0:
-		var blast = global_position - col.get_position()
-		var energy: Vector2 = blast * crashPower * power
-		if energy.length() < 10000:
-			velocity = energy
-			decelSpeed = crashDecel
-		stagger(true)
-	else:
-		GM.playerDie(self)
-	health -= 1
+	if !invincible:
+		#invulnerate(true)
+		blowUp()
+		#print("hit at " + str(global_position) + " form " + str(col.get_position()))
+		#print(str(velocity.length()) + " / " + str(highVelocity) + " = " + str(power))
+		if health > 0:
+			blasted(pos, power)
+		else:
+			GM.playerDie(self)
+		health -= 1
 
+func blasted(pos, power):
+	var blast = global_position - pos
+	var energy: Vector2 = blast * crashPower * power
+	print("blasted " + str(power) + " " + str(energy))
+	if energy.length() < 10000:
+		velocity += energy
+		decelSpeed = crashDecel
+	stagger(true)
+	
 func stagger(stagged: bool):
 	if stagged:
 		staggerCounter = staggerPower
@@ -97,9 +114,26 @@ func stagger(stagged: bool):
 		staggerCounter = 0
 		staggered = false
 		decelSpeed = baseDecel
-		
+
+func invulnerate(on: bool):
+	if on:
+		invincible = true
+		invincibleCounter = invincibleTime
+	else:
+		invincible = false
+		invincibleCounter = 0
+	
 func camGrav(delta):
 	cam.rotation_degrees += camRot * delta
 	var grav = Vector2.DOWN.rotated(cam.rotation)
 	#if !boosting:
 	velocity += grav * delta * curGrav
+	
+func blowUp():
+	var blast = blastScene.instantiate()
+	blast.GM = GM
+	blast.endSize = 20
+	blast.blastPower = 0
+	blast.lifeTime = 5
+	blast.global_position = global_position
+	get_tree().get_current_scene().add_child(blast)

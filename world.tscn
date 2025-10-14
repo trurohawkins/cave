@@ -8,7 +8,7 @@
 script = ExtResource("1_aqk2v")
 playerScene = ExtResource("3_tlwt5")
 chunkScene = ExtResource("3_aqk2v")
-mapSize = Vector2i(3, 3)
-chunkSize = Vector2i(100, 100)
+mapSize = Vector2i(2, 2)
+chunkSize = Vector2i(300, 300)
 spawnPoint = Vector2(200, -500)
 respawnRate = 1
