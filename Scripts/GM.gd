@@ -8,7 +8,9 @@ var size: Vector2
 
 @export var spawnPoint: Vector2
 @export var respawnRate = 100
-@onready var BG = $DarkCaveBg
+@onready var BG = $ColorRect
+@onready var cam = $Camera2D
+var bgShader
 
 var respawnCounter = 0
 var shaders = []
@@ -20,7 +22,8 @@ func _ready():
 
 func spawnMap():
 	size = Vector2(mapSize.x * chunkSize.x, mapSize.y * chunkSize.y)
-	shaders.append(BG.material)
+	#shaders.append(BG.material)
+	bgShader = BG.material
 	for chunkX in range(mapSize.x):
 		var col = []
 		for chunkY in range(mapSize.y):
@@ -85,6 +88,7 @@ func shapeMap():
 		tunnel()
 	spawnPoint = center * 32
 	spawnPoint.y += 20 * 32#grounds player at start
+	print(spawnPoint)
 	makeHole(center, 20, 20, false, true)
 	
 
@@ -151,11 +155,36 @@ func makeHole(pos: Vector2, radius: float, shell: int, fill: bool, perfect: bool
 						grid[chunk[0]][chunk[1]].set_cell(mc[1], -1)
 			
 func onResize():
-	for s in shaders:
+	for i in range(shaders.size()):
+		var s = shaders[i]
+		#if i != 0:
 		s.set_shader_parameter("lightRadius", 300.0)
 		var viewport_size = get_viewport().get_visible_rect().size
 		var screen_center = viewport_size / 2
 		s.set_shader_parameter("lightPos", screen_center)
+		"""
+		else:
+			
+			s.set_shader_parameter("lightRadius", 100.0)
+			s.set_shader_parameter("lightPos", Vector2(480, 480))#size.x/2 * 32, size.y/2 * 32))
+		"""
+		"""
+	var canvasPos = get_canvas_transform() * localCenter
+	localCenter = get_canvas_transform().affine_inverse() * canvasPos
+	var screenSpace = get_viewport().get_screen_transform() * get_global_transform_with_canvas() * localCenter
+	"""
+	var localCenter = Vector2(4800, 4800)
+
+	var globalPos = to_global(localCenter)
+	print(globalPos)
+	var camera = get_viewport().get_camera_2d()
+	#var screenSpace = camera.get_screen_position(globalPos)
+	var screenSpace= (globalPos - camera.get_screen_center_position()) * camera.zoom + get_viewport_rect().size / 2.0
+	#var screenSpace = get_viewport().get_global_canvas_transform() * globalPos
+	var root = get_tree().root
+	var ciScreenPos = (root.get_final_transform() * get_global_transform_with_canvas()).origin + Vector2(root.position)
+	print("sp " + str(screenSpace) + " " + str(ciScreenPos))
+	bgShader.set_shader_parameter("lightPos", screenSpace)#Vector2((size.x/2) * 32, size.y/2 * 32))
 				
 func addNeighbor(chunk, x, y):
 	var xp = chunk.gridPos.x + x
@@ -170,11 +199,12 @@ func spawnPlayer():
 		var player = playerScene.instantiate()
 		get_tree().current_scene.add_child(player)
 		player.global_position = spawnPoint
-		player.receiveGM(self)
+		player.receiveGM(self, cam)
 		return player
 
 func playerDie(player):
 	print("player is dead")
+	player.gun.queue_free()
 	player.queue_free()
 	respawnCounter = respawnRate
 	
@@ -204,6 +234,11 @@ var winner: bool = false
 func occludeChunks(player: CharacterBody2D):
 	#var mc = posToChunk(player.global_position)
 	#spawnPoint = Vector2((mapSize.x / 2 * chunkSize.x + chunkSize.x/2) * 32, (mapSize.y / 2 * chunkSize.y + chunkSize.y/2) * 32)
+	var localCenter = Vector2(4800, 4800)
+	var globalPos = to_global(localCenter)
+	var camera = get_viewport().get_camera_2d()
+	var screenSpace= (globalPos - camera.get_screen_center_position()) * camera.zoom + get_viewport_rect().size / 2.0
+	bgShader.set_shader_parameter("lightPos", screenSpace)
 	if !winner:
 		if player.global_position.x < 0 || player.global_position.y < 0 || player.global_position.x > chunkSize.x * mapSize.x * 32 || player.global_position.y > chunkSize.y * mapSize.y * 32:
 			winner = true

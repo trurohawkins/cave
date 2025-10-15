@@ -9,8 +9,9 @@ var shooting: bool = false
 @export var player: CharacterBody2D
 @export var shotCost: float = 5
 @onready var spawnPoint = $hand/muzzle
+@onready var handEnergySprite = $hand/deet
 var GM: Node2D
-
+var cam: Camera2D
 
 func _input(event):
 	if useMouse:
@@ -26,10 +27,21 @@ func _input(event):
 			shooting = false
 
 func _process(delta):
+	if !player:
+		return
+	global_position = player.global_position
 	if useMouse:
 		var targAngle = (get_global_mouse_position() - global_position).angle()
 		rotation = lerp_angle(rotation, targAngle, delta * turnSpeed)
 	else:
+		var direction = Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
+		if direction != Vector2.ZERO:
+			#print(str(direction) + " " + str(direction.length()))
+			var angle = direction.rotated(cam.rotation).angle()
+			rotation = lerp_angle(rotation, angle, delta * turnSpeed)
+			if abs(angle - rotation) < 0.1:
+				rotation = angle
+		"""
 		var left = 0
 		if Input.is_action_pressed("aim_left"):
 			left = -1
@@ -40,7 +52,7 @@ func _process(delta):
 		var direction = left + right
 		if direction != 0:
 			rotation += direction * turnSpeed * delta
-		
+		"""
 	if coolTimer - delta * coolDelta > 0:
 		coolTimer -= delta * coolDelta
 	else:

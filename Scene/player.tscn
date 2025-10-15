@@ -15,25 +15,22 @@ shader_parameter/desaturation = 0.0
 
 [node name="Player" type="CharacterBody2D"]
 scale = Vector2(6, 6)
-collision_layer = 2
+collision_layer = 0
 script = ExtResource("1_r6jsd")
 energy = 30.0
-speed = 1500
+speed = 2500
 crashDecel = 10.0
 landingPower = 0.3
 staggerPower = 0.0
 invincibleTime = 5.0
-camRot = 0.5
 gravPower = 50
 maxGrav = 1400
 blastScene = ExtResource("2_p6qlh")
+gunScene = ExtResource("3_2sw5t")
+rotSpeed = 5.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_036b0")
-
-[node name="gun" parent="." node_paths=PackedStringArray("player") instance=ExtResource("3_2sw5t")]
-scale = Vector2(0.5, 0.5)
-player = NodePath("..")
 
 [node name="bodySprite" type="Sprite2D" parent="."]
 scale = Vector2(0.61999995, 0.61999995)
@@ -43,6 +40,3 @@ texture = ExtResource("4_ij4jb")
 material = SubResource("ShaderMaterial_dw050")
 scale = Vector2(0.62, 0.62)
 texture = ExtResource("6_c31lq")
-
-[node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(0.3, 0.3)

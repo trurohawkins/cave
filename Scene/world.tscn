@@ -1,15 +1,22 @@
-[gd_scene load_steps=7 format=3 uid="uid://buddmvvh18voa"]
+[gd_scene load_steps=10 format=3 uid="uid://buddmvvh18voa"]
 
 [ext_resource type="Script" uid="uid://bnmc75io2k5ca" path="res://Scripts/GM.gd" id="1_aqk2v"]
 [ext_resource type="PackedScene" uid="uid://c5jp5rmk0hlc4" path="res://Scene/chunk.tscn" id="3_aqk2v"]
 [ext_resource type="PackedScene" uid="uid://dur2pvkhlv1eq" path="res://Scene/player.tscn" id="3_tlwt5"]
 [ext_resource type="Shader" uid="uid://bdvmpay2ytrjf" path="res://Scripts/chunkTiles.gdshader" id="4_pcvp0"]
 [ext_resource type="Texture2D" uid="uid://dffqrts78nikr" path="res://Sprites/darkCaveBG.png" id="4_scul4"]
+[ext_resource type="Shader" uid="uid://clxo6jixrlk5w" path="res://Scripts/reverseShadow.gdshader" id="6_37axr"]
+[ext_resource type="PackedScene" uid="uid://odag4wsgc6v7" path="res://Scene/camera.tscn" id="7_ol2hl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_37axr"]
 shader = ExtResource("4_pcvp0")
 shader_parameter/lightPos = Vector2(450, 230)
 shader_parameter/lightRadius = 300.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ol2hl"]
+shader = ExtResource("6_37axr")
+shader_parameter/lightPos = Vector2(0, 0)
+shader_parameter/lightRadius = 1600.0
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_aqk2v")
@@ -25,3 +32,13 @@ material = SubResource("ShaderMaterial_37axr")
 position = Vector2(5414.0005, 5541.0005)
 scale = Vector2(12, 12)
 texture = ExtResource("4_scul4")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_ol2hl")
+offset_left = -49032.0
+offset_top = -48471.0
+offset_right = 117378.0
+offset_bottom = 63330.0
+
+[node name="Camera2D" parent="." instance=ExtResource("7_ol2hl")]
+zoom = Vector2(0.3, 0.3)
