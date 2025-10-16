@@ -188,3 +188,4 @@ material = SubResource("ShaderMaterial_a0kup")
 tile_set = SubResource("TileSet_036b0")
 script = ExtResource("2_a0kup")
 chunkSize = 100.0
+destructionSpeed = 2000.0

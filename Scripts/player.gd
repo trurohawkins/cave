@@ -21,7 +21,7 @@ var curGrav = 0
 var cam: Camera2D
 var gun
 @onready var energySprite = $deetSprite
-
+@onready var thrustSprite = $thrustSprite
 
 var staggerDelta: float = 10
 var staggerCounter: float = 0
@@ -137,8 +137,11 @@ func thrust(delta: float):
 		if abs(angle - rotation) < 0.1:
 			rotation = angle
 		velocity += -Vector2.DOWN.rotated(rotation) * speed * delta * direction.length()
+		thrustSprite.visible = true
 		return true
-	return false
+	else:
+		thrustSprite.visible = false
+		return false
 	"""
 	var direction = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if direction != Vector2.ZERO && energy > thrustCost * delta:
@@ -214,15 +217,12 @@ func camGrav(delta):
 	elif rotation != cam.rotation:
 		rotation = cam.rotation
 	var grav = Vector2.DOWN.rotated(cam.rotation)
-	#if !boosting:
 	velocity += grav * delta * curGrav
 	
 func blowUp():
 	var blast = blastScene.instantiate()
 	blast.GM = GM
-	blast.endSize = 20
 	blast.blastPower = 0
 	blast.lifeTime = 5
 	blast.global_position = global_position
 	get_tree().get_current_scene().add_child(blast)
-	

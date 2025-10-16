@@ -11,6 +11,8 @@ TileSetAtlasSource.TRANSFORM_FLIP_H | TileSetAtlasSource.TRANSFORM_FLIP_V,
 TileSetAtlasSource.TRANSFORM_TRANSPOSE | TileSetAtlasSource.TRANSFORM_FLIP_H,
 ]
 var gridPos
+var toBeDestroyed: Array = []
+@export var destructionSpeed: float = 100
 
 func _ready():
 	modulate = Color(0.2,0.1,0.3)
@@ -18,6 +20,14 @@ func _ready():
 	#modulate = Color(randf(), randf(), randf(), 1)
 	#set_cell(Vector2i(1,1), -1)
 
+func _process(delta: float):
+	var amnt = destructionSpeed * delta
+	for i in range(amnt):
+		if toBeDestroyed.size() > 0:
+			var cell = toBeDestroyed.pop_at(0)
+			destroyCell(cell)
+		else:
+			break
 
 func spawnChunk():
 	for x in range(chunkSize):
@@ -151,7 +161,12 @@ func receiveCollision(pos: Vector2i, preCalc: bool):
 	if not preCalc:
 		pos.x -= gridPos.x * chunkSize
 		pos.y -= gridPos.y * chunkSize
+	if !pos in toBeDestroyed:
+		#print("appending " + str(pos))
+		toBeDestroyed.append(pos)
 
+
+func destroyCell(pos: Vector2i):
 	set_cell(pos, -1)
 	for x in range(-1, 2):
 		for y in range(-1, 2):

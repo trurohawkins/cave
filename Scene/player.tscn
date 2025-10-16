@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://dur2pvkhlv1eq"]
+[gd_scene load_steps=10 format=3 uid="uid://dur2pvkhlv1eq"]
 
 [ext_resource type="Script" uid="uid://d10y87l7bijlt" path="res://Scripts/player.gd" id="1_r6jsd"]
-[ext_resource type="PackedScene" uid="uid://i17p6qyg72js" path="res://Scene/blast.tscn" id="2_p6qlh"]
+[ext_resource type="PackedScene" uid="uid://bjw48syvvdsbb" path="res://Scene/playerBlast.tscn" id="2_p6qlh"]
 [ext_resource type="PackedScene" uid="uid://plw4uxg427gw" path="res://Scene/gun.tscn" id="3_2sw5t"]
 [ext_resource type="Texture2D" uid="uid://bnvkaukpj2qwn" path="res://Sprites/skullManBody.png" id="4_ij4jb"]
+[ext_resource type="Texture2D" uid="uid://dhig6bdely3j4" path="res://Sprites/skullManThrust.png" id="4_p6qlh"]
 [ext_resource type="Shader" uid="uid://ckqteutove7gn" path="res://Scripts/desaturate.gdshader" id="5_c68nv"]
 [ext_resource type="Texture2D" uid="uid://crpnhxgdk681y" path="res://Sprites/skullManFeatures.png" id="6_c31lq"]
 
@@ -15,7 +16,7 @@ shader_parameter/desaturation = 0.0
 
 [node name="Player" type="CharacterBody2D"]
 scale = Vector2(6, 6)
-collision_layer = 0
+collision_layer = 2
 script = ExtResource("1_r6jsd")
 energy = 30.0
 speed = 2500
@@ -31,6 +32,11 @@ rotSpeed = 5.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_036b0")
+
+[node name="thrustSprite" type="Sprite2D" parent="."]
+position = Vector2(0, 17.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("4_p6qlh")
 
 [node name="bodySprite" type="Sprite2D" parent="."]
 scale = Vector2(0.61999995, 0.61999995)
