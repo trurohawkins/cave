@@ -1,13 +1,14 @@
 [gd_scene load_steps=5 format=3 uid="uid://c8i78vpf02m1f"]
 
 [ext_resource type="Script" uid="uid://ch1v7xi0j4nel" path="res://Scripts/missile.gd" id="1_0uoyr"]
-[ext_resource type="Texture2D" uid="uid://clbhg28hpiuff" path="res://Sprites/pizza.png" id="2_11vnk"]
 [ext_resource type="PackedScene" uid="uid://i17p6qyg72js" path="res://Scene/blast.tscn" id="2_bqn2q"]
+[ext_resource type="Texture2D" uid="uid://badpw8ngqxppt" path="res://Sprites/skullBlast.png" id="3_7grq7"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bqn2q"]
+radius = 5.0
 
 [node name="missile" type="CharacterBody2D"]
-scale = Vector2(5, 5)
+scale = Vector2(6, 6)
 collision_layer = 2
 script = ExtResource("1_0uoyr")
 speed = 2000.0
@@ -17,5 +18,5 @@ blastScene = ExtResource("2_bqn2q")
 shape = SubResource("CircleShape2D_bqn2q")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.8, 0.8)
-texture = ExtResource("2_11vnk")
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("3_7grq7")

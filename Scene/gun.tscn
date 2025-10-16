@@ -11,11 +11,15 @@ shader = ExtResource("4_5twiu")
 shader_parameter/desaturation = 0.0
 
 [node name="Gun" type="Node2D"]
+scale = Vector2(6, 6)
 script = ExtResource("1_dk5gl")
+coolDown = 3.0
 bulletScene = ExtResource("2_8iju2")
+shotCost = 2.0
 
 [node name="hand" type="Sprite2D" parent="."]
 position = Vector2(35, 0)
+scale = Vector2(0.6, 0.6)
 texture = ExtResource("3_ikln6")
 
 [node name="deet" type="Sprite2D" parent="hand"]

@@ -44,5 +44,5 @@ texture = ExtResource("4_ij4jb")
 
 [node name="deetSprite" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_dw050")
-scale = Vector2(0.62, 0.62)
+scale = Vector2(0.6, 0.6)
 texture = ExtResource("6_c31lq")
