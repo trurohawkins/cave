@@ -23,7 +23,7 @@ var curGrav = 0
 var cam: Camera2D
 var gun
 #@onready var energySprite = $deetSprite
-var energySprite
+@onready var energySprite = $energySprite
 @onready var thrustSprite = $thrustSprite
 @onready var groundCheck = $RayCast2D
 @onready var bodySprite = $BodySprite
@@ -54,12 +54,21 @@ func _ready():
 	gun.player = self
 	gun.scale = scale / 2
 	bodySprite.play("idle_front")
-	setEnergySaturate()
+	energySprite.visible = false
+	#setEnergySaturate()
 
-func setEnergySaturate():
+func setEnergySprite():
 	if energySprite:
-		energySprite.material.set_shader_parameter("desaturation", 1.0 - (energy/energyMax))
-		gun.handEnergySprite.material.set_shader_parameter("desaturation", 1.0 - (energy/energyMax))
+		var curEnergy = energy/energyMax
+		energySprite.visible =  curEnergy > 0.1
+		if curEnergy > 0.66:
+			energySprite.frame_coords.y = 2
+		elif curEnergy > 0.33:
+			energySprite.frame_coords.y = 1
+		elif curEnergy > 0.1:
+			energySprite.frame_coords.y = 0
+		#energySprite.material.set_shader_parameter("desaturation", 1.0 - (energy/energyMax))
+		#gun.handEnergySprite.material.set_shader_parameter("desaturation", 1.0 - (energy/energyMax))
 	
 func receiveGM(gm, camera):
 	GM = gm
@@ -73,8 +82,12 @@ func receiveGM(gm, camera):
 func _physics_process(delta):
 	if Input.is_action_just_pressed("energize"):
 		energyMode = !energyMode
-		if energyMode && !staggered:
-			bodySprite.play("in_air")
+		energySprite.visible = energyMode
+		if energyMode:
+			if !staggered:
+				bodySprite.play("in_air")
+			setEnergySprite()
+		
 	#dprint(str(velocity.x) + " abs " + str(abs(velocity.x)) + " -abs: " + str(-abs(velocity.x)))
 	var decel = Vector2(-sign(velocity.x), -sign(velocity.y)) * decelSpeed * delta
 	#print(str(velocity) + " " + str(velocity.length()) + " decel " + str(decel))
@@ -203,10 +216,12 @@ func thrust(delta: float):
 		if abs(angle - rotation) < 0.1:
 			rotation = angle
 		velocity += -Vector2.DOWN.rotated(rotation) * thrustSpeed * delta * direction.length()
-		thrustSprite.visible = true
+		energySprite.frame_coords.x = 1
+		#thrustSprite.visible = true
 		return true
 	else:
-		thrustSprite.visible = false
+		#thrustSprite.visible = false
+		energySprite.frame_coords.x = 0
 		return false
 
 func camGrav(delta):
@@ -257,7 +272,7 @@ func changeEnergy(amnt: float, pause: bool):
 			energy = 0
 	if pause:
 		rPauseTimer = rechargePause
-	setEnergySaturate()
+	setEnergySprite()
 
 func blasted(pos, power):
 	var blast = global_position - pos

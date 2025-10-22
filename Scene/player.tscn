@@ -1,10 +1,11 @@
-[gd_scene load_steps=19 format=3 uid="uid://dur2pvkhlv1eq"]
+[gd_scene load_steps=20 format=3 uid="uid://dur2pvkhlv1eq"]
 
 [ext_resource type="Script" uid="uid://d10y87l7bijlt" path="res://Scripts/player.gd" id="1_r6jsd"]
 [ext_resource type="PackedScene" uid="uid://bjw48syvvdsbb" path="res://Scene/playerBlast.tscn" id="2_p6qlh"]
 [ext_resource type="PackedScene" uid="uid://plw4uxg427gw" path="res://Scene/gun.tscn" id="3_2sw5t"]
 [ext_resource type="Texture2D" uid="uid://dhig6bdely3j4" path="res://Sprites/skullManThrust.png" id="4_p6qlh"]
 [ext_resource type="Texture2D" uid="uid://cw1dnmikqa41r" path="res://Sprites/guybo.png" id="5_ivevv"]
+[ext_resource type="Texture2D" uid="uid://b8x8oeoyqaydh" path="res://Sprites/energyAura.png" id="5_r6jsd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_036b0"]
 size = Vector2(20, 59)
@@ -25,17 +26,17 @@ region = Rect2(64, 0, 64, 64)
 atlas = ExtResource("5_ivevv")
 region = Rect2(128, 64, 64, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ij4jb"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_c31lq"]
 atlas = ExtResource("5_ivevv")
-region = Rect2(64, 64, 64, 64)
+region = Rect2(0, 128, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_c68nv"]
 atlas = ExtResource("5_ivevv")
 region = Rect2(128, 64, 64, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_c31lq"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_ij4jb"]
 atlas = ExtResource("5_ivevv")
-region = Rect2(0, 128, 64, 64)
+region = Rect2(64, 64, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2dof7"]
 atlas = ExtResource("5_ivevv")
@@ -84,13 +85,13 @@ animations = [{
 "texture": SubResource("AtlasTexture_2sw5t")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_ij4jb")
+"texture": SubResource("AtlasTexture_c31lq")
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_c68nv")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_c31lq")
+"texture": SubResource("AtlasTexture_ij4jb")
 }],
 "loop": true,
 "name": &"in_air",
@@ -144,7 +145,13 @@ texture = ExtResource("4_p6qlh")
 [node name="RayCast2D" type="RayCast2D" parent="."]
 target_position = Vector2(0, 48)
 
+[node name="energySprite" type="Sprite2D" parent="."]
+texture = ExtResource("5_r6jsd")
+hframes = 2
+vframes = 3
+
 [node name="BodySprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_eqmt2")
-animation = &"hurt"
+animation = &"in_air"
+speed_scale = 2.0
 flip_h = true
