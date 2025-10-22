@@ -59,7 +59,7 @@ func _process(delta):
 		coolTimer -= delta * coolDelta
 	else:
 		coolTimer = 0
-	if shooting:
+	if shooting && player.energyMode:
 		spawnBullet()
 
 func spawnBullet():
@@ -71,5 +71,5 @@ func spawnBullet():
 		bullet.global_position = spawnPoint.global_position
 		bullet.global_rotation = spawnPoint.global_rotation
 		bullet.velocity = player.velocity / 2
-		print(spawnPoint.global_rotation)
+		#print(spawnPoint.global_rotation)
 		get_tree().current_scene.add_child(bullet)

@@ -1,28 +1,129 @@
-[gd_scene load_steps=10 format=3 uid="uid://dur2pvkhlv1eq"]
+[gd_scene load_steps=19 format=3 uid="uid://dur2pvkhlv1eq"]
 
 [ext_resource type="Script" uid="uid://d10y87l7bijlt" path="res://Scripts/player.gd" id="1_r6jsd"]
 [ext_resource type="PackedScene" uid="uid://bjw48syvvdsbb" path="res://Scene/playerBlast.tscn" id="2_p6qlh"]
 [ext_resource type="PackedScene" uid="uid://plw4uxg427gw" path="res://Scene/gun.tscn" id="3_2sw5t"]
-[ext_resource type="Texture2D" uid="uid://bnvkaukpj2qwn" path="res://Sprites/skullManBody.png" id="4_ij4jb"]
 [ext_resource type="Texture2D" uid="uid://dhig6bdely3j4" path="res://Sprites/skullManThrust.png" id="4_p6qlh"]
-[ext_resource type="Shader" uid="uid://ckqteutove7gn" path="res://Scripts/desaturate.gdshader" id="5_c68nv"]
-[ext_resource type="Texture2D" uid="uid://crpnhxgdk681y" path="res://Sprites/skullManFeatures.png" id="6_c31lq"]
+[ext_resource type="Texture2D" uid="uid://cw1dnmikqa41r" path="res://Sprites/guybo.png" id="5_ivevv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_036b0"]
+size = Vector2(20, 59)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_dw050"]
-shader = ExtResource("5_c68nv")
-shader_parameter/desaturation = 0.0
+[sub_resource type="AtlasTexture" id="AtlasTexture_ivevv"]
+atlas = ExtResource("5_ivevv")
+region = Rect2(64, 128, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r6jsd"]
+atlas = ExtResource("5_ivevv")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p6qlh"]
+atlas = ExtResource("5_ivevv")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2sw5t"]
+atlas = ExtResource("5_ivevv")
+region = Rect2(128, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ij4jb"]
+atlas = ExtResource("5_ivevv")
+region = Rect2(64, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c68nv"]
+atlas = ExtResource("5_ivevv")
+region = Rect2(128, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c31lq"]
+atlas = ExtResource("5_ivevv")
+region = Rect2(0, 128, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2dof7"]
+atlas = ExtResource("5_ivevv")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4ao7i"]
+atlas = ExtResource("5_ivevv")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1sypm"]
+atlas = ExtResource("5_ivevv")
+region = Rect2(0, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fn0wv"]
+atlas = ExtResource("5_ivevv")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_eqmt2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ivevv")
+}],
+"loop": true,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r6jsd")
+}],
+"loop": false,
+"name": &"idle_front",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p6qlh")
+}],
+"loop": false,
+"name": &"idle_side",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2sw5t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ij4jb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c68nv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c31lq")
+}],
+"loop": true,
+"name": &"in_air",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2dof7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4ao7i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1sypm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fn0wv")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 5.0
+}]
 
 [node name="Player" type="CharacterBody2D"]
-scale = Vector2(6, 6)
 collision_layer = 2
 script = ExtResource("1_r6jsd")
 energy = 30.0
-speed = 2500
+thrustSpeed = 2500
 crashDecel = 10.0
-landingPower = 0.3
-staggerPower = 0.0
+highVelocity = 1400.0
+landingPower = 0.4
+walkSpeed = 2000.0
+staggerPower = 5.0
 invincibleTime = 5.0
 gravPower = 50
 maxGrav = 1400
@@ -31,18 +132,19 @@ gunScene = ExtResource("3_2sw5t")
 rotSpeed = 5.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0.5)
 shape = SubResource("RectangleShape2D_036b0")
 
 [node name="thrustSprite" type="Sprite2D" parent="."]
+visible = false
 position = Vector2(0, 17.5)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("4_p6qlh")
 
-[node name="bodySprite" type="Sprite2D" parent="."]
-scale = Vector2(0.61999995, 0.61999995)
-texture = ExtResource("4_ij4jb")
+[node name="RayCast2D" type="RayCast2D" parent="."]
+target_position = Vector2(0, 48)
 
-[node name="deetSprite" type="Sprite2D" parent="."]
-material = SubResource("ShaderMaterial_dw050")
-scale = Vector2(0.6, 0.6)
-texture = ExtResource("6_c31lq")
+[node name="BodySprite" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_eqmt2")
+animation = &"hurt"
+flip_h = true

@@ -155,35 +155,16 @@ func makeHole(pos: Vector2, radius: float, shell: int, fill: bool, perfect: bool
 						grid[chunk[0]][chunk[1]].set_cell(mc[1], -1)
 			
 func onResize():
-	for i in range(shaders.size()):
-		var s = shaders[i]
-		#if i != 0:
+	for s in shaders:
 		s.set_shader_parameter("lightRadius", 300.0)
 		var viewport_size = get_viewport().get_visible_rect().size
 		var screen_center = viewport_size / 2
 		s.set_shader_parameter("lightPos", screen_center)
-		"""
-		else:
-			
-			s.set_shader_parameter("lightRadius", 100.0)
-			s.set_shader_parameter("lightPos", Vector2(480, 480))#size.x/2 * 32, size.y/2 * 32))
-		"""
-		"""
-	var canvasPos = get_canvas_transform() * localCenter
-	localCenter = get_canvas_transform().affine_inverse() * canvasPos
-	var screenSpace = get_viewport().get_screen_transform() * get_global_transform_with_canvas() * localCenter
-	"""
-	var localCenter = Vector2(4800, 4800)
 
+	var localCenter = Vector2(4800, 4800)
 	var globalPos = to_global(localCenter)
-	print(globalPos)
 	var camera = get_viewport().get_camera_2d()
-	#var screenSpace = camera.get_screen_position(globalPos)
-	var screenSpace= (globalPos - camera.get_screen_center_position()) * camera.zoom + get_viewport_rect().size / 2.0
-	#var screenSpace = get_viewport().get_global_canvas_transform() * globalPos
-	var root = get_tree().root
-	var ciScreenPos = (root.get_final_transform() * get_global_transform_with_canvas()).origin + Vector2(root.position)
-	print("sp " + str(screenSpace) + " " + str(ciScreenPos))
+	var screenSpace = (globalPos - camera.get_screen_center_position()) * camera.zoom + get_viewport_rect().size / 2.0
 	bgShader.set_shader_parameter("lightPos", screenSpace)#Vector2((size.x/2) * 32, size.y/2 * 32))
 				
 func addNeighbor(chunk, x, y):
