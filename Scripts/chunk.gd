@@ -29,10 +29,10 @@ func _ready():
 	#set_cell(Vector2i(1,1), -1)
 
 func plantSeed(pos: Vector2, gm):
-	var seed = plantScene.instantiate()
-	seed.global_position = pos
-	seed.birth(gm)
-	get_tree().current_scene.add_child(seed)
+	var seedling = plantScene.instantiate()
+	seedling.global_position = pos
+	seedling.birth(gm, self)
+	get_tree().current_scene.add_child(seedling)
 
 func setPlayerLight(radius: float, color: Vector3):
 	material.set_shader_parameter("playerRadius", radius)
@@ -84,7 +84,7 @@ func tileBlock(x: int, y: int):
 		for j in range(4):
 			var cur = (start + j) % 4
 			#print("  checking " + str(block + dir4[cur]) + " " + str(checkCell(block + dir4[cur])))
-			if checkCell(block + dir4[cur]) != id:
+			if checkCell(block + dir4[cur]) == -1:#!= id:
 				openSides += 1
 			else:
 				break
@@ -196,9 +196,13 @@ func setCell(id: int, pos: Vector2i, preCalc: bool):
 	#print("setting " + str(pos) + " to " + str(id))
 	set_cell(pos, id, Vector2i(0, 0))
 	tileBlock(pos.x, pos.y)
+	checkSurround(pos)
 
 func destroyCell(pos: Vector2i):
 	set_cell(pos, -1)
+	checkSurround(pos)
+
+func checkSurround(pos: Vector2i):
 	for x in range(-1, 2):
 		for y in range(-1, 2):
 			#if x != 0 or y != 0:

@@ -38,7 +38,7 @@ shader_parameter/lightRadius = 1600.0
 script = ExtResource("1_aqk2v")
 playerScene = ExtResource("3_tlwt5")
 chunkScene = ExtResource("3_aqk2v")
-mapSize = Vector2i(3, 3)
+mapSize = Vector2i(1, 1)
 chunkSize = Vector2i(100, 100)
 spawnPoint = Vector2(200, -500)
 respawnRate = 1
@@ -58,5 +58,5 @@ offset_right = 117378.0
 offset_bottom = 63330.0
 
 [node name="Camera2D" parent="." instance=ExtResource("7_ol2hl")]
-zoom = Vector2(0.5, 0.5)
+zoom = Vector2(1, 1)
 rotSpeed = 1.0
