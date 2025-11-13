@@ -10,8 +10,24 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_37axr"]
 shader = ExtResource("4_pcvp0")
-shader_parameter/lightPos = Vector2(450, 230)
-shader_parameter/lightRadius = 300.0
+shader_parameter/lightCount = 2
+shader_parameter/playerPos = Vector2(0, 0)
+shader_parameter/playerRadius = 0.0
+shader_parameter/playerColor = Vector3(0, 0, 0)
+shader_parameter/lightPos = PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/lightRadii = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/lightColors = PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/ambientColor = Vector3(0.1, 0, 0)
+shader_parameter/tileSize = Vector2(32, 32)
+shader_parameter/tileMapOrigin = Vector2(0, 0)
+shader_parameter/cameraMatrix = Basis(1, 0, 0, 0, 1, 0, 0, 0, 1)
+shader_parameter/viewport_size = Vector2(0, 0)
+shader_parameter/inv_projection = Projection(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+shader_parameter/camera_transform = Projection(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+shader_parameter/camera_position = Vector2(0, 0)
+shader_parameter/camera_zoom = Vector2(0, 0)
+shader_parameter/screen_size = Vector2(0, 0)
+shader_parameter/camera_rotation = 0.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ol2hl"]
 shader = ExtResource("6_37axr")
@@ -22,8 +38,8 @@ shader_parameter/lightRadius = 1600.0
 script = ExtResource("1_aqk2v")
 playerScene = ExtResource("3_tlwt5")
 chunkScene = ExtResource("3_aqk2v")
-mapSize = Vector2i(1, 1)
-chunkSize = Vector2i(300, 300)
+mapSize = Vector2i(3, 3)
+chunkSize = Vector2i(100, 100)
 spawnPoint = Vector2(200, -500)
 respawnRate = 1
 
@@ -34,6 +50,7 @@ scale = Vector2(12, 12)
 texture = ExtResource("4_scul4")
 
 [node name="ColorRect" type="ColorRect" parent="."]
+visible = false
 material = SubResource("ShaderMaterial_ol2hl")
 offset_left = -49032.0
 offset_top = -48471.0
@@ -42,3 +59,4 @@ offset_bottom = 63330.0
 
 [node name="Camera2D" parent="." instance=ExtResource("7_ol2hl")]
 zoom = Vector2(0.5, 0.5)
+rotSpeed = 1.0

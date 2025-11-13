@@ -5,6 +5,7 @@ extends Node2D
 @export var chunkSize: Vector2i
 var grid = []
 var size: Vector2
+var curPlayer
 
 @export var spawnPoint: Vector2
 @export var respawnRate = 100
@@ -17,8 +18,8 @@ var shaders = []
 
 func _ready():
 	spawnMap()
-	var player = spawnPlayer()
-	occludeChunks(player)
+	spawnPlayer()
+	occludeChunks(curPlayer)
 
 func spawnMap():
 	size = Vector2(mapSize.x * chunkSize.x, mapSize.y * chunkSize.y)
@@ -59,6 +60,9 @@ func spawnMap():
 				#cur.hollowCenter(75)
 			#var poo = cur.get_cell_tile_data(Vector2i(0, 0)).material
 			shaders.append(cur.material)
+			cur.setPlayerLight(500, Vector3(1.0, 1.0, 1.0))
+			var mapOrigin = cur.to_global(Vector2.ZERO)
+			cur.material.set_shader_parameter("tileMapOrigin", cur.global_position)#mapOrigin)
 	shapeMap()
 	for x in range(mapSize.x):
 		for y in range(mapSize.y):
@@ -68,6 +72,18 @@ func spawnMap():
 	#spawnPoint = Vector2((mapSize.x / 2 * chunkSize.x + chunkSize.x/2) * 32, (mapSize.y / 2 * chunkSize.y + chunkSize.y/2) * 32)
 	get_viewport().connect("size_changed", Callable(self, "onResize"))
 	#onResize()
+	var plantPoint = spawnPoint
+	plantPoint.y -= 32
+	plantPoint.x += 64
+	plant(plantPoint)
+
+func setPlayerLight(radius: float, color: Vector3):
+	for x in range(mapSize.x):
+		for y in range(mapSize.y):
+			var cur = grid[x][y]
+			cur.setPlayerLight(radius, color)
+			cur.material.set_shader_parameter("playerPos", curPlayer.global_position)
+		
 
 func shapeMap():
 	var center = Vector2(size.x/2, size.y/2)
@@ -88,8 +104,14 @@ func shapeMap():
 		tunnel()
 	spawnPoint = center * 32
 	spawnPoint.y += 20 * 32#grounds player at start
+	
 	print(spawnPoint)
+	var mc = posToChunk(spawnPoint/32)
+	var chunk = mc[0]
+	print("player start: " + str(mc))
+	grid[chunk[0]][chunk[1]].addLight(spawnPoint, 500, Vector3(0.5, 0.8, 0.3))
 	makeHole(center, 20, 20, false, true)
+	
 	
 
 func tunnel():
@@ -155,18 +177,34 @@ func makeHole(pos: Vector2, radius: float, shell: int, fill: bool, perfect: bool
 						grid[chunk[0]][chunk[1]].set_cell(mc[1], -1)
 			
 func onResize():
-	for s in shaders:
-		s.set_shader_parameter("lightRadius", 300.0)
-		var viewport_size = get_viewport().get_visible_rect().size
-		var screen_center = viewport_size / 2
-		s.set_shader_parameter("lightPos", screen_center)
-
 	var localCenter = Vector2(4800, 4800)
 	var globalPos = to_global(localCenter)
 	var camera = get_viewport().get_camera_2d()
 	var screenSpace = (globalPos - camera.get_screen_center_position()) * camera.zoom + get_viewport_rect().size / 2.0
 	bgShader.set_shader_parameter("lightPos", screenSpace)#Vector2((size.x/2) * 32, size.y/2 * 32))
-				
+	
+	var viewport_size = get_viewport().get_visible_rect().size
+	var screenCenter = viewport_size / 2
+	#print(screenCenter)
+	'''
+	var positions = [Vector2(4800, 5440)]#, Vector2(4800, 480)];
+	var radii = [400, 500]
+	var colors = [Vector3(1.0, 1.0, 1.0), Vector3(1.0, 1.0, 1.0)]
+	var lightCount = positions.size()
+	while positions.size() < 16:
+		positions.append(Vector2.ZERO);
+		radii.append(0)
+		colors.append(Vector3.ZERO);
+		
+	for s in shaders:
+		s.set_shader_parameter("lightCount", lightCount)
+		s.set_shader_parameter("lightRadii", radii)
+		s.set_shader_parameter("lightPos", positions)
+		s.set_shader_parameter("lightColors", colors)
+		s.set_shader_parameter("ambientColor", Vector3.ZERO)
+		#s.set_shader_parameter("viewportSize", get_viewport().get_visible_rect().size)
+	'''
+
 func addNeighbor(chunk, x, y):
 	var xp = chunk.gridPos.x + x
 	var yp = chunk.gridPos.y + y
@@ -177,23 +215,52 @@ func addNeighbor(chunk, x, y):
 
 func spawnPlayer():
 	if playerScene:
-		var player = playerScene.instantiate()
-		get_tree().current_scene.add_child(player)
-		player.global_position = spawnPoint
-		player.receiveGM(self, cam)
-		return player
+		curPlayer = playerScene.instantiate()
+		get_tree().current_scene.add_child(curPlayer)
+		curPlayer.global_position = spawnPoint
+		curPlayer.receiveGM(self, cam)
+		curPlayer.setEnergyMode(false)
+		print("player pos " + str(curPlayer.global_position))
 
 func playerDie(player):
 	print("player is dead")
 	player.gun.queue_free()
 	player.queue_free()
 	respawnCounter = respawnRate
-	
+
+func plant(pos: Vector2):
+	var mc = posToChunk(pos/32)
+	var chunk = mc[0]
+	if chunk[0] >= 0 && chunk[0] < mapSize.x && chunk[1] >= 0 && chunk[1] < mapSize.y:
+		chunk = grid[chunk[0]][chunk[1]]
+		var map = mc[1]
+		chunk.plantSeed(pos, self)
+
 func _process(delta):
 	if respawnCounter > 0:
 		respawnCounter -= delta * 10
 		if respawnCounter <= 0:
 			spawnPlayer()
+	var canvasXform = cam.get_global_transform()
+	var screenToWorld = canvasXform#.affine_inverse()
+
+	setCameraMatrix(screenToWorld)#transform2dToMat3(screenToWorld))
+
+func setCameraMatrix(mat):
+	#var view = get_viewport_rect().size;
+	#print("setting camera matrix to " + str(mat))
+	for s in shaders:
+		s.set_shader_parameter("camera_position", cam.global_position);
+		s.set_shader_parameter("camera_zoom", cam.zoom);
+		s.set_shader_parameter("screen_size", get_viewport_rect().size);
+		s.set_shader_parameter("camera_rotation", cam.rotation);
+		
+func transform2dToMat3(xform: Transform2D):
+	return PackedFloat32Array([
+		xform.x.x, xform.x.y, 0.0,
+		xform.y.x, xform.y.y, 0.0,
+		xform.origin.x, xform.origin.y, 1.0
+	])
 
 func posToChunk(pos: Vector2):
 	var mapPos = Vector2i(pos.x, pos.y)
@@ -209,7 +276,16 @@ func checkCollision(mc):
 		var map = mc[1]
 		#print("chunk: " + str(mc[0]) + " pos: " + str(map))
 		chunk.receiveCollision(map, true)
-	
+
+func setCell(pos: Vector2i, id: int):
+	var mc = posToChunk(pos)
+	var chunk = mc[0]
+	if chunk[0] >= 0 && chunk[0] < mapSize.x && chunk[1] >= 0 && chunk[1] < mapSize.y:
+		chunk = grid[chunk[0]][chunk[1]]
+		var map = mc[1]
+		print(mc)
+		chunk.setCell(id, map, true)
+
 var winner: bool = false	
 
 func occludeChunks(player: CharacterBody2D):
@@ -233,4 +309,4 @@ func occludeChunks(player: CharacterBody2D):
 			var dist = max(abs(x - px), abs(y - py))
 			#print(str(x) + ", " + str(y) + " " + str(dist))
 			#1 for square, figure out aspect ratio and do it per x and y
-			grid[x][y].occlude(false)#dist >1)
+			grid[x][y].occlude(dist > 1, player.global_position)

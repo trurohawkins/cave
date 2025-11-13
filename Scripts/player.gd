@@ -54,7 +54,6 @@ func _ready():
 	gun.player = self
 	gun.scale = scale / 2
 	bodySprite.play("idle_front")
-	energySprite.visible = false
 	#setEnergySaturate()
 
 func setEnergySprite():
@@ -78,15 +77,20 @@ func receiveGM(gm, camera):
 	cam.global_position = global_position
 	gun.cam = cam
 
-	
+func setEnergyMode(on: bool):
+	energyMode = on
+	energySprite.visible = energyMode
+	if energyMode:
+		if !staggered:
+			bodySprite.play("in_air")
+		setEnergySprite()
+		GM.setPlayerLight(500, Vector3(0.4, 1.0, 0.2))
+	else:
+		GM.setPlayerLight(300, Vector3(0.5, 0.5, 0.5))
+			
 func _physics_process(delta):
 	if Input.is_action_just_pressed("energize"):
-		energyMode = !energyMode
-		energySprite.visible = energyMode
-		if energyMode:
-			if !staggered:
-				bodySprite.play("in_air")
-			setEnergySprite()
+		setEnergyMode(!energyMode)
 		
 	#dprint(str(velocity.x) + " abs " + str(abs(velocity.x)) + " -abs: " + str(-abs(velocity.x)))
 	var decel = Vector2(-sign(velocity.x), -sign(velocity.y)) * decelSpeed * delta

@@ -13,12 +13,30 @@ TileSetAtlasSource.TRANSFORM_TRANSPOSE | TileSetAtlasSource.TRANSFORM_FLIP_H,
 var gridPos
 var toBeDestroyed: Array = []
 @export var destructionSpeed: float = 100
+@export var plantScene: PackedScene
+var plants: Array = []
+
+#lights
+var lightPos: Array = []
+var lightRadii: Array = []
+var lightColors: Array = []
 
 func _ready():
 	modulate = Color(0.2,0.1,0.3)
-	#modulate = Color(1, 1, 1)
+	visible = false
+	modulate = Color(1, 1, 1)
 	#modulate = Color(randf(), randf(), randf(), 1)
 	#set_cell(Vector2i(1,1), -1)
+
+func plantSeed(pos: Vector2, gm):
+	var seed = plantScene.instantiate()
+	seed.global_position = pos
+	seed.birth(gm)
+	get_tree().current_scene.add_child(seed)
+
+func setPlayerLight(radius: float, color: Vector3):
+	material.set_shader_parameter("playerRadius", radius)
+	material.set_shader_parameter("playerColor", color)
 
 func _process(delta: float):
 	var amnt = destructionSpeed * delta
@@ -50,9 +68,13 @@ func tileChunk():
 
 func tileBlock(x: int, y: int):
 	var block = Vector2i(x,y)
+	var id = get_cell_source_id(block)
+	if id == 2:
+		print("tiling plant")
 		#print("block " + str(x) + str(y))
-	if get_cell_source_id(block) == -1:
+	if id == -1:
 		return
+	
 	var start = 0
 	var startSide = start
 	var mostOpen = -1
@@ -62,7 +84,7 @@ func tileBlock(x: int, y: int):
 		for j in range(4):
 			var cur = (start + j) % 4
 			#print("  checking " + str(block + dir4[cur]) + " " + str(checkCell(block + dir4[cur])))
-			if checkCell(block + dir4[cur]) == -1:
+			if checkCell(block + dir4[cur]) != id:
 				openSides += 1
 			else:
 				break
@@ -113,7 +135,9 @@ func tileBlock(x: int, y: int):
 			startSide = check
 		else:
 			mostOpen = 0
-	set_cell(Vector2i(x, y), 1, Vector2i(0, mostOpen), rotations[(startSide)%4])
+	if id == 2:
+		print(mostOpen)
+	set_cell(Vector2i(x, y), id, Vector2i(0, mostOpen), rotations[(startSide)%4])
 	#print(str(startSide))
 	
 func checkCell(pos):
@@ -165,6 +189,13 @@ func receiveCollision(pos: Vector2i, preCalc: bool):
 		#print("appending " + str(pos))
 		toBeDestroyed.append(pos)
 
+func setCell(id: int, pos: Vector2i, preCalc: bool):
+	if not preCalc:
+		pos.x -= gridPos.x * chunkSize
+		pos.y -= gridPos.y * chunkSize
+	#print("setting " + str(pos) + " to " + str(id))
+	set_cell(pos, id, Vector2i(0, 0))
+	tileBlock(pos.x, pos.y)
 
 func destroyCell(pos: Vector2i):
 	set_cell(pos, -1)
@@ -183,7 +214,35 @@ func check_and_tile(pos):
 	if get_cell_source_id(pos) != -1:
 		tileBlock(pos.x, pos.y)
 		
-func occlude(on: bool):
+func occlude(on: bool, playerPos: Vector2):
 	visible = !on
+	if visible:
+		material.set_shader_parameter("playerPos", playerPos)
+
 	#turning off collisions makes it so projectiles can fly through without destroying
 	#collision_enabled = !on
+
+func addLight(pos: Vector2, radius: float, color: Vector3):
+	if lightPos.size() < 16:
+		lightPos.append(pos)
+		lightRadii.append(radius)
+		lightColors.append(color)
+		var lights = []
+		var radii = []
+		var colors = []
+		for i in range(16):
+			if i < lightPos.size():
+				print(lightPos[i])
+				lights.append(lightPos[i])
+				radii.append(lightRadii[i])
+				colors.append(lightColors[i])
+			else:
+				lights.append(Vector2.ZERO)
+				radii.append(0)
+				colors.append(Vector3.ZERO)
+		
+		material.set_shader_parameter("lightPos", lights)
+		material.set_shader_parameter("lightRadii", radii)
+		material.set_shader_parameter("lightColors", colors)
+		material.set_shader_parameter("lightCount", lightPos.size())
+		material.set_shader_parameter("ambientColor", Vector3(0, 0, 0))
