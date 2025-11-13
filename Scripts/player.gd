@@ -57,7 +57,7 @@ func _ready():
 	#setEnergySaturate()
 
 func setEnergySprite():
-	if energySprite:
+	if energySprite && energyMode:
 		var curEnergy = energy/energyMax
 		energySprite.visible =  curEnergy > 0.1
 		if curEnergy > 0.66:
@@ -66,7 +66,7 @@ func setEnergySprite():
 			energySprite.frame_coords.y = 1
 		elif curEnergy > 0.1:
 			energySprite.frame_coords.y = 0
-		#energySprite.material.set_shader_parameter("desaturation", 1.0 - (energy/energyMax))
+	bodySprite.material.set_shader_parameter("desaturation", 1.0 - (energy/energyMax))
 		#gun.handEnergySprite.material.set_shader_parameter("desaturation", 1.0 - (energy/energyMax))
 	
 func receiveGM(gm, camera):
@@ -90,7 +90,8 @@ func setEnergyMode(on: bool):
 			
 func _physics_process(delta):
 	if Input.is_action_just_pressed("energize"):
-		setEnergyMode(!energyMode)
+		if !energyMode || energy/energyMax > 0.1:
+			setEnergyMode(!energyMode)
 		
 	#dprint(str(velocity.x) + " abs " + str(abs(velocity.x)) + " -abs: " + str(-abs(velocity.x)))
 	var decel = Vector2(-sign(velocity.x), -sign(velocity.y)) * decelSpeed * delta
@@ -100,6 +101,7 @@ func _physics_process(delta):
 		velocity = Vector2.ZERO
 	else:
 		velocity += decel
+	
 	if staggerCounter - delta * staggerDelta > 0:
 		staggerCounter -= delta * staggerDelta
 	else:
@@ -130,26 +132,33 @@ func _physics_process(delta):
 	for i in colCount:
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
-		if collider is TileMapLayer && power >= landingPower:
+		if collider is TileMapLayer:
 			var myDir = myVelocity.normalized().angle()
 			#print(rad_to_deg(myDir))
 			var crashDir = ((global_position/32) - (collision.get_position()/32)).normalized()
 			crashDir.y *= -1
 			crashDir = crashDir.angle()
 			var diff = rad_to_deg(wrapf(myDir - crashDir, -PI, PI))
+			if velocity.length() > 0:
+				print("im at " + str(Vector2i(global_position/32)))
+				print("hit something at " + str(Vector2i(collision.get_position()/32)) + " " + str(velocity))
+				print("my dir: " + str(myDir) + " crash dir: " + str(crashDir))
 			
-			if abs(diff) < 45:
-				#print("collided at " + str(power) + " " + str(diff))
-				crash(collision.get_position(), power)
-				#if Input.is_action_pressed("move_left") || Input.is_action_pressed("move_right"):
-				"""
-				print("my pos: " + str(global_position) + " collision " + str(collision.get_position()))
-				print("my dir: " + str(int(rad_to_deg(myDir))) + " crash: " + str(int(rad_to_deg(crashDir))))
-				print("angular diff: " + str(int(diff)))
+			if power >= landingPower:
+
 				
-			else:
-				print(str(rad_to_deg(myDir)) + " " + str(rad_to_deg(crashDir)))
-				"""
+				if abs(diff) < 45:
+					#print("collided at " + str(power) + " " + str(diff))
+					crash(collision.get_position(), power)
+					#if Input.is_action_pressed("move_left") || Input.is_action_pressed("move_right"):
+					"""
+					print("my pos: " + str(global_position) + " collision " + str(collision.get_position()))
+					print("my dir: " + str(int(rad_to_deg(myDir))) + " crash: " + str(int(rad_to_deg(crashDir))))
+					print("angular diff: " + str(int(diff)))
+					
+				else:
+					print(str(rad_to_deg(myDir)) + " " + str(rad_to_deg(crashDir)))
+					"""
 			#GM.playerDie(self)
 	if rPauseTimer - delta > 0:
 		#print(rPauseTimer)
@@ -244,10 +253,10 @@ func camGrav(delta):
 		velocity += grav * delta * curGrav
 	
 func crash(pos: Vector2, power: float):
-	print(power)
+	#print(power)
 	if power < landingPower:
 		return
-	print(str(power) + " < " + str(landingPower))
+	#print(str(power) + " < " + str(landingPower))
 	if !invincible:
 		invulnerate(true)
 		if energyMode:
@@ -274,6 +283,8 @@ func changeEnergy(amnt: float, pause: bool):
 			energy += amnt
 		else:
 			energy = 0
+		if energy/energyMax < 0.1 && energyMode:
+			setEnergyMode(false)
 	if pause:
 		rPauseTimer = rechargePause
 	setEnergySprite()

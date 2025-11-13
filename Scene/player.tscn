@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://dur2pvkhlv1eq"]
+[gd_scene load_steps=22 format=3 uid="uid://dur2pvkhlv1eq"]
 
 [ext_resource type="Script" uid="uid://d10y87l7bijlt" path="res://Scripts/player.gd" id="1_r6jsd"]
 [ext_resource type="PackedScene" uid="uid://bjw48syvvdsbb" path="res://Scene/playerBlast.tscn" id="2_p6qlh"]
@@ -6,9 +6,14 @@
 [ext_resource type="Texture2D" uid="uid://dhig6bdely3j4" path="res://Sprites/skullManThrust.png" id="4_p6qlh"]
 [ext_resource type="Texture2D" uid="uid://cw1dnmikqa41r" path="res://Sprites/guybo.png" id="5_ivevv"]
 [ext_resource type="Texture2D" uid="uid://b8x8oeoyqaydh" path="res://Sprites/energyAura.png" id="5_r6jsd"]
+[ext_resource type="Shader" uid="uid://ckqteutove7gn" path="res://Scripts/desaturate.gdshader" id="6_p6qlh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_036b0"]
 size = Vector2(20, 59)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2sw5t"]
+shader = ExtResource("6_p6qlh")
+shader_parameter/desaturation = 0.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ivevv"]
 atlas = ExtResource("5_ivevv")
@@ -151,6 +156,7 @@ hframes = 2
 vframes = 3
 
 [node name="BodySprite" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_2sw5t")
 sprite_frames = SubResource("SpriteFrames_eqmt2")
 animation = &"in_air"
 speed_scale = 2.0

@@ -59,4 +59,4 @@ offset_bottom = 63330.0
 
 [node name="Camera2D" parent="." instance=ExtResource("7_ol2hl")]
 zoom = Vector2(1, 1)
-rotSpeed = 1.0
+rotSpeed = 0.0

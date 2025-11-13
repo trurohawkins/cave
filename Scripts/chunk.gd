@@ -69,9 +69,6 @@ func tileChunk():
 func tileBlock(x: int, y: int):
 	var block = Vector2i(x,y)
 	var id = get_cell_source_id(block)
-	if id == 2:
-		print("tiling plant")
-		#print("block " + str(x) + str(y))
 	if id == -1:
 		return
 	
@@ -135,8 +132,6 @@ func tileBlock(x: int, y: int):
 			startSide = check
 		else:
 			mostOpen = 0
-	if id == 2:
-		print(mostOpen)
 	set_cell(Vector2i(x, y), id, Vector2i(0, mostOpen), rotations[(startSide)%4])
 	#print(str(startSide))
 	
