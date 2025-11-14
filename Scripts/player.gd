@@ -27,6 +27,7 @@ var gun
 @onready var thrustSprite = $thrustSprite
 @onready var groundCheck = $RayCast2D
 @onready var bodySprite = $BodySprite
+@onready var clean = $Cleaner
 
 var staggerDelta: float = 10
 var staggerCounter: float = 0
@@ -70,8 +71,10 @@ func setEnergySprite():
 		#gun.handEnergySprite.material.set_shader_parameter("desaturation", 1.0 - (energy/energyMax))
 	
 func receiveGM(gm, camera):
+	print("sawned at " + str(global_position/32))
 	GM = gm
 	gun.GM = gm
+	clean.GM = gm
 	cam = camera
 	cam.follow = self
 	cam.global_position = global_position
@@ -139,10 +142,6 @@ func _physics_process(delta):
 			crashDir.y *= -1
 			crashDir = crashDir.angle()
 			var diff = rad_to_deg(wrapf(myDir - crashDir, -PI, PI))
-			if velocity.length() > 0:
-				print("im at " + str(Vector2i(global_position/32)))
-				print("hit something at " + str(Vector2i(collision.get_position()/32)) + " " + str(velocity))
-				print("my dir: " + str(myDir) + " crash dir: " + str(crashDir))
 			
 			if power >= landingPower:
 

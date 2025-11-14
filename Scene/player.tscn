@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://dur2pvkhlv1eq"]
+[gd_scene load_steps=24 format=3 uid="uid://dur2pvkhlv1eq"]
 
 [ext_resource type="Script" uid="uid://d10y87l7bijlt" path="res://Scripts/player.gd" id="1_r6jsd"]
 [ext_resource type="PackedScene" uid="uid://bjw48syvvdsbb" path="res://Scene/playerBlast.tscn" id="2_p6qlh"]
@@ -7,9 +7,10 @@
 [ext_resource type="Texture2D" uid="uid://cw1dnmikqa41r" path="res://Sprites/guybo.png" id="5_ivevv"]
 [ext_resource type="Texture2D" uid="uid://b8x8oeoyqaydh" path="res://Sprites/energyAura.png" id="5_r6jsd"]
 [ext_resource type="Shader" uid="uid://ckqteutove7gn" path="res://Scripts/desaturate.gdshader" id="6_p6qlh"]
+[ext_resource type="Script" uid="uid://b2pk68q3g6fra" path="res://Scripts/cleaner.gd" id="8_2sw5t"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_036b0"]
-size = Vector2(20, 59)
+size = Vector2(32, 62)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_2sw5t"]
 shader = ExtResource("6_p6qlh")
@@ -120,6 +121,9 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ij4jb"]
+size = Vector2(64, 54)
+
 [node name="Player" type="CharacterBody2D"]
 collision_layer = 2
 script = ExtResource("1_r6jsd")
@@ -161,3 +165,13 @@ sprite_frames = SubResource("SpriteFrames_eqmt2")
 animation = &"in_air"
 speed_scale = 2.0
 flip_h = true
+
+[node name="Cleaner" type="Area2D" parent="."]
+script = ExtResource("8_2sw5t")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Cleaner"]
+shape = SubResource("RectangleShape2D_ij4jb")
+
+[connection signal="area_entered" from="Cleaner" to="Cleaner" method="_on_area_entered"]
+[connection signal="body_entered" from="Cleaner" to="Cleaner" method="_on_body_entered"]
+[connection signal="body_exited" from="Cleaner" to="Cleaner" method="_on_body_exited"]

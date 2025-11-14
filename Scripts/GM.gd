@@ -283,9 +283,16 @@ func setCell(pos: Vector2i, id: int):
 	if chunk[0] >= 0 && chunk[0] < mapSize.x && chunk[1] >= 0 && chunk[1] < mapSize.y:
 		chunk = grid[chunk[0]][chunk[1]]
 		var map = mc[1]
-		print(mc)
 		chunk.setCell(id, map, true)
 
+func checkCell(mc):
+	var chunk = mc[0]
+	if chunk[0] >= 0 && chunk[0] < mapSize.x && chunk[1] >= 0 && chunk[1] < mapSize.y:
+		chunk = grid[chunk[0]][chunk[1]]
+		var map = mc[1]
+		return chunk.get_cell_source_id(map)
+	return -1
+		
 var winner: bool = false	
 
 func occludeChunks(player: CharacterBody2D):

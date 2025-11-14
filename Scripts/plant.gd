@@ -22,7 +22,9 @@ func _process(_delta: float) -> void:
 				if grow(body[g]):
 					break
 			else:
+				var chunk = check(body[g])
 				body.remove_at(g)
+				chunk[0].destroyCell(chunk[1])
 				i -= 1
 		counter = 0
 	else:
@@ -34,9 +36,11 @@ func checkValid(index: int):
 	if chunk[0].get_cell_source_id(chunk[1]) == -1:
 		return false
 	var full = 0
+	print("at pos " + str(pos))
 	for d in dirs:
 		var chk = Vector2i(pos) + d
 		chunk = check(chk)
+		print("   dchcking " + str(chk))
 		if chunk[0].get_cell_source_id(chunk[1]) != -1:
 			full += 1
 	#if it hs no neighbors it is floating so we remove, 

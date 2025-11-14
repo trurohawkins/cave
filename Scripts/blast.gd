@@ -41,10 +41,6 @@ func _on_body_entered(body):
 func getCollisions():
 	var shape = $CollisionShape2D.shape
 	var square = Vector2(shape.radius * scale.x, shape.radius * scale.y)
-	"""
-	var topLeft = map.local_to_map(global_position - square)
-	var botRight = map.local_to_map(global_position + square)
-	"""
 	var topLeft = (global_position - square) / 32
 	var botRight = (global_position + square) / 32
 
