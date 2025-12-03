@@ -33,7 +33,11 @@ func plantSeed(pos: Vector2, gm):
 	seedling.global_position = pos
 	seedling.birth(gm, self)
 	get_tree().current_scene.add_child(seedling)
+	plants.append(seedling)
 
+func findPlant(pos: Vector2i):
+	for plant in plants:
+		pass
 func setPlayerLight(radius: float, color: Vector3):
 	material.set_shader_parameter("playerRadius", radius)
 	material.set_shader_parameter("playerColor", color)
