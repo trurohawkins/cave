@@ -3,6 +3,6 @@
 [ext_resource type="Script" uid="uid://dvpqea3tuo2yj" path="res://Scripts/camera.gd" id="1_u5kg4"]
 
 [node name="Camera2D" type="Camera2D"]
-zoom = Vector2(0.1, 0.1)
+zoom = Vector2(0.5, 0.5)
 script = ExtResource("1_u5kg4")
 rotSpeed = 0.1

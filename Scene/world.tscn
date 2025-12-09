@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://buddmvvh18voa"]
+[gd_scene load_steps=11 format=3 uid="uid://buddmvvh18voa"]
 
 [ext_resource type="Script" uid="uid://bnmc75io2k5ca" path="res://Scripts/GM.gd" id="1_aqk2v"]
 [ext_resource type="PackedScene" uid="uid://c5jp5rmk0hlc4" path="res://Scene/chunk.tscn" id="3_aqk2v"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://dffqrts78nikr" path="res://Sprites/darkCaveBG.png" id="4_scul4"]
 [ext_resource type="Shader" uid="uid://clxo6jixrlk5w" path="res://Scripts/reverseShadow.gdshader" id="6_37axr"]
 [ext_resource type="PackedScene" uid="uid://odag4wsgc6v7" path="res://Scene/camera.tscn" id="7_ol2hl"]
+[ext_resource type="PackedScene" uid="uid://b5oroy85of22w" path="res://Scene/hud.tscn" id="8_ddf65"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_37axr"]
 shader = ExtResource("4_pcvp0")
@@ -38,6 +39,7 @@ shader_parameter/lightRadius = 1600.0
 script = ExtResource("1_aqk2v")
 playerScene = ExtResource("3_tlwt5")
 chunkScene = ExtResource("3_aqk2v")
+hudScene = ExtResource("8_ddf65")
 mapSize = Vector2i(1, 1)
 chunkSize = Vector2i(100, 100)
 spawnPoint = Vector2(200, -500)
@@ -58,5 +60,4 @@ offset_right = 117378.0
 offset_bottom = 63330.0
 
 [node name="Camera2D" parent="." instance=ExtResource("7_ol2hl")]
-zoom = Vector2(1, 1)
 rotSpeed = 0.0

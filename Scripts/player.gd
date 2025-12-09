@@ -10,11 +10,12 @@ var decelSpeed: float = 0.5
 @export var highVelocity: float = 2000
 @export var landingPower: float = 0.5
 @export var walkSpeed: float = 500
+@export var walkDecel: float = 1
 
 @export var staggerPower: float = 50
 @export var invincibleTime: float = 20
-@export var gravPower = 1000
-@export var maxGrav = 2000
+@export var gravPower = 50
+@export var maxGrav = 1400
 @export var blastScene: PackedScene
 @export var gunScene: PackedScene
 @export var energyMode = false
@@ -26,8 +27,10 @@ var gun
 @onready var energySprite = $energySprite
 @onready var thrustSprite = $thrustSprite
 @onready var groundCheck = $RayCast2D
-@onready var bodySprite = $BodySprite
+@onready var bodySprite: AnimatedSprite2D = $BodySprite
 @onready var clean = $Cleaner
+
+@onready var body = $CollisionShape2D
 
 var staggerDelta: float = 10
 var staggerCounter: float = 0
@@ -45,6 +48,9 @@ var rechargePause: float = 1
 var rPauseTimer = 0
 var rechargeSpeed: float = 3#0.2
 
+var idle: int = 100
+var crouching: int = 0
+var dead: int = 0
 
 func _ready():
 	decelSpeed = baseDecel
@@ -54,7 +60,7 @@ func _ready():
 	get_tree().current_scene.add_child(gun)
 	gun.player = self
 	gun.scale = scale / 2
-	bodySprite.play("idle_front")
+	#adddwdbodySprite.play("rise")
 	#setEnergySaturate()
 
 func setEnergySprite():
@@ -86,25 +92,25 @@ func setEnergyMode(on: bool):
 	if energyMode:
 		if !staggered:
 			bodySprite.play("in_air")
+			print("enegy mode in air")
+			decelSpeed = baseDecel
 		setEnergySprite()
 		GM.setPlayerLight(500, Vector3(0.4, 1.0, 0.2))
 	else:
+		decelSpeed = walkDecel
 		GM.setPlayerLight(300, Vector3(0.5, 0.5, 0.5))
 			
 func _physics_process(delta):
+	if dead > 0:
+		if dead == 1:
+			bodySprite.play("hurt")
+		elif dead == 50:
+			GM.playerDie()
+		dead += 1
+		return
 	if Input.is_action_just_pressed("energize"):
 		if !energyMode || energy/energyMax > 0.1:
 			setEnergyMode(!energyMode)
-		
-	#dprint(str(velocity.x) + " abs " + str(abs(velocity.x)) + " -abs: " + str(-abs(velocity.x)))
-	var decel = Vector2(-sign(velocity.x), -sign(velocity.y)) * decelSpeed * delta
-	#print(str(velocity) + " " + str(velocity.length()) + " decel " + str(decel))
-	var check = velocity + decel
-	if check.length() < 20:
-		velocity = Vector2.ZERO
-	else:
-		velocity += decel
-	
 	if staggerCounter - delta * staggerDelta > 0:
 		staggerCounter -= delta * staggerDelta
 	else:
@@ -119,46 +125,45 @@ func _physics_process(delta):
 		else:
 			curGrav = maxGrav
 	else:
-		curGrav = 0
+		curGrav = 0		
 	camGrav(delta)
-	#print(velocity.length())
-	var power = min(velocity.length(), highVelocity) / highVelocity
-	#camGrav(delta)
-	var myVelocity = velocity
-	move_and_slide()
-	if global_position != prePos:
-		#print("moved")
-		GM.occludeChunks(self)
-	prePos = global_position
-	#slideCollision()
-	var colCount = get_slide_collision_count()
-	for i in colCount:
-		var collision = get_slide_collision(i)
-		var collider = collision.get_collider()
-		if collider is TileMapLayer:
-			var myDir = myVelocity.normalized().angle()
-			#print(rad_to_deg(myDir))
-			var crashDir = ((global_position/32) - (collision.get_position()/32)).normalized()
-			crashDir.y *= -1
-			crashDir = crashDir.angle()
-			var diff = rad_to_deg(wrapf(myDir - crashDir, -PI, PI))
-			
-			if power >= landingPower:
+	#dprint(str(velocity.x) + " abs " + str(abs(velocity.x)) + " -abs: " + str(-abs(velocity.x)))
+	if velocity != Vector2.ZERO:
+		var decel = Vector2(-sign(velocity.x), -sign(velocity.y)) * decelSpeed * delta
+		#print(str(velocity) + " " + str(velocity.length()) + " decel " + str(decel))
+		var check = velocity + decel
+		#print(" check length: " + str(check.length()))
+		if check.length() < 20:
+			velocity = Vector2.ZERO
+		else:
+			#print(str(velocity) + " + " + str(decel) + " = " + str(velocity + decel))
+			velocity += decel
 
-				
-				if abs(diff) < 45:
-					#print("collided at " + str(power) + " " + str(diff))
-					crash(collision.get_position(), power)
-					#if Input.is_action_pressed("move_left") || Input.is_action_pressed("move_right"):
-					"""
-					print("my pos: " + str(global_position) + " collision " + str(collision.get_position()))
-					print("my dir: " + str(int(rad_to_deg(myDir))) + " crash: " + str(int(rad_to_deg(crashDir))))
-					print("angular diff: " + str(int(diff)))
+		var power = min(velocity.length(), highVelocity) / highVelocity
+		#camGrav(delta)
+		var myVelocity = velocity
+		move_and_slide()
+		if global_position != prePos:
+			#print("moved")
+			GM.occludeChunks(self)
+		prePos = global_position
+		#slideCollision()
+		var colCount = get_slide_collision_count()
+		for i in colCount:
+			var collision = get_slide_collision(i)
+			var collider = collision.get_collider()
+			if collider is TileMapLayer:
+				var myDir = myVelocity.normalized().angle()
+				#print(rad_to_deg(myDir))
+				var crashDir = ((global_position/32) - (collision.get_position()/32)).normalized()
+				crashDir.y *= -1
+				crashDir = crashDir.angle()
+				var diff = rad_to_deg(wrapf(myDir - crashDir, -PI, PI))
+				if power >= landingPower:
+
 					
-				else:
-					print(str(rad_to_deg(myDir)) + " " + str(rad_to_deg(crashDir)))
-					"""
-			#GM.playerDie(self)
+					if abs(diff) < 45:
+						crash(collision.get_position(), power)
 	if rPauseTimer - delta > 0:
 		#print(rPauseTimer)
 		rPauseTimer -= delta
@@ -195,26 +200,47 @@ func walk(delta: float):
 		jump = jump.rotated(cam.rotation)
 		#print(jump)
 		velocity += jump * delta * 3000
-	
+	if Input.is_action_just_pressed("move_down"):
+		bodySprite.play_backwards("rise")
+		velocity = Vector2.ZERO
+		crouching = 1
+		idle = 100
+	elif Input.is_action_just_released("move_down"):
+		print(bodySprite.frame)
+		bodySprite.play("rise")
+		'''
+		if crouching == 2:
+			
+			crouching = 1
+		elif crouching == 1:
+			print(bodySprite.frame)
+			crouching = 0
+		'''
 	var dir = 0;
-	if Input.is_action_pressed("move_left"):
-		dir -= 1
-		bodySprite.flip_h = true
-	if Input.is_action_pressed("move_right"):
-		dir += 1
-		bodySprite.flip_h = false
-	if dir != 0:
-		var move = Vector2(dir, 0)
-		move = move.rotated(rotation)
-		velocity += move * delta * walkSpeed
-	if !staggered:
-		if grounded:
+	if crouching == 0:
+		if Input.is_action_pressed("move_left"):
+			dir -= 1
+			bodySprite.flip_h = true
+		if Input.is_action_pressed("move_right"):
+			dir += 1
+			bodySprite.flip_h = false
+		if dir != 0:
+			var move = Vector2(dir, 0)
+			move = move.rotated(rotation)
+			velocity += move * delta * walkSpeed
+	if grounded:
+		if !crouching:
 			if dir == 0:
-				bodySprite.play("idle_side")
+				if idle < 100:
+					bodySprite.play("idle_side")
+					idle += 1
+				else:
+					bodySprite.play("idle_front")
 			else:
 				bodySprite.play("walk")
-		else:
-			bodySprite.play("in_air")
+				idle = 0
+	else:
+		bodySprite.play("in_air")
 	return grounded
 	
 @export var rotSpeed: float = 0.1
@@ -255,7 +281,7 @@ func crash(pos: Vector2, power: float):
 	#print(power)
 	if power < landingPower:
 		return
-	#print(str(power) + " < " + str(landingPower))
+	print(str(power) + " < " + str(landingPower))
 	if !invincible:
 		invulnerate(true)
 		if energyMode:
@@ -265,9 +291,9 @@ func crash(pos: Vector2, power: float):
 				changeEnergy(-10, true)
 				blasted(pos, power)
 			else:
-				GM.playerDie(self)
+				die()
 		else:
-			GM.playerDie(self)
+			die()
 
 func changeEnergy(amnt: float, pause: bool):
 	if amnt == 0:
@@ -302,6 +328,7 @@ func stagger(stagged: bool):
 		staggered = true
 		bodySprite.play("hurt")
 	elif staggered:
+		print("not staggered")
 		bodySprite.play("in_air")
 		staggerCounter = 0
 		staggered = false
@@ -322,3 +349,28 @@ func blowUp():
 	blast.lifeTime = 5
 	blast.global_position = global_position
 	get_tree().get_current_scene().add_child(blast)
+
+func die():
+	dead = 1
+	#GM.playerDie(self)
+
+func _on_body_sprite_animation_finished():
+	if bodySprite.animation == "rise":
+		if bodySprite.frame == 0:
+			crouching = 2
+		else:
+			crouching = 0
+
+
+func _on_body_sprite_animation_changed():
+	#print("new animation " + bodySprite.animation)
+	pass
+
+
+func _on_body_sprite_frame_changed():
+	if bodySprite.animation == "rise":
+		var progress = float(bodySprite.frame) / float(bodySprite.sprite_frames.get_frame_count("rise"))
+		print(str(bodySprite.frame) + " " + str(progress))
+		var rect: RectangleShape2D = body.shape
+		rect.size.y = lerp(30, 60, progress)
+		body.position.y = lerp(18.0, 3.0, progress)

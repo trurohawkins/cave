@@ -3,6 +3,7 @@ extends Camera2D
 @export var rotSpeed: float = 0.5
 @export var follow: Node2D
 
+
 func _ready():
 	ignore_rotation = false
 

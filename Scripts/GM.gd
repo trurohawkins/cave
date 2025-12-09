@@ -1,8 +1,10 @@
 extends Node2D
 @export var playerScene: PackedScene
 @export var chunkScene: PackedScene
+@export var hudScene: PackedScene
 @export var mapSize: Vector2i
 @export var chunkSize: Vector2i
+var HUD: CanvasLayer
 var grid = []
 var size: Vector2
 var curPlayer
@@ -17,6 +19,8 @@ var respawnCounter = 0
 var shaders = []
 
 func _ready():
+	HUD = hudScene.instantiate()
+	get_tree().current_scene.add_child(HUD)
 	spawnMap()
 	spawnPlayer()
 	occludeChunks(curPlayer)
@@ -214,6 +218,7 @@ func addNeighbor(chunk, x, y):
 		chunk.neighbors.append(TYPE_NIL)
 
 func spawnPlayer():
+	print("spawning player")
 	if playerScene:
 		curPlayer = playerScene.instantiate()
 		get_tree().current_scene.add_child(curPlayer)
@@ -222,11 +227,16 @@ func spawnPlayer():
 		curPlayer.setEnergyMode(false)
 		print("player pos " + str(curPlayer.global_position))
 
-func playerDie(player):
-	print("player is dead")
-	player.gun.queue_free()
-	player.queue_free()
-	respawnCounter = respawnRate
+func killPlayer():
+	curPlayer.gun.queue_free()
+	curPlayer.queue_free()
+
+func playerDie():
+	#print("player is dead")
+	#player.gun.queue_free()
+	#player.queue_free()
+	HUD.deathSequence(self)
+	#respawnCounter = respawnRate
 
 func plant(pos: Vector2):
 	var mc = posToChunk(pos/32)
@@ -240,7 +250,9 @@ func _process(delta):
 	if respawnCounter > 0:
 		respawnCounter -= delta * 10
 		if respawnCounter <= 0:
-			spawnPlayer()
+			print("queueong free!!")
+			curPlayer.gun.queue_free()
+			curPlayer.queue_free()
 	var canvasXform = cam.get_global_transform()
 	var screenToWorld = canvasXform#.affine_inverse()
 

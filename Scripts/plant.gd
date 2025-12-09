@@ -24,7 +24,7 @@ func birth(gm, chunk):
 
 func _process(_delta: float) -> void:
 	if counter % evapSpeed == 0:
-		print(water)
+		#ssprint(water)
 		if water >= evapPower:
 			water -= evapPower
 		else:
