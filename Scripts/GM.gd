@@ -76,6 +76,7 @@ func spawnMap():
 	#spawnPoint = Vector2((mapSize.x / 2 * chunkSize.x + chunkSize.x/2) * 32, (mapSize.y / 2 * chunkSize.y + chunkSize.y/2) * 32)
 	get_viewport().connect("size_changed", Callable(self, "onResize"))
 	#onResize()
+	updateSpawnPoint()
 	var plantPoint = spawnPoint
 	plantPoint.y -= 32
 	plantPoint.x += 64
@@ -107,7 +108,7 @@ func shapeMap():
 	for i in range(tunnels):
 		tunnel()
 	spawnPoint = center * 32
-	spawnPoint.y += 20 * 32#grounds player at start
+	#spawnPoint.y += 20 * 32#grounds player at start
 	
 	print(spawnPoint)
 	var mc = posToChunk(spawnPoint/32)
@@ -217,6 +218,17 @@ func addNeighbor(chunk, x, y):
 	else:
 		chunk.neighbors.append(TYPE_NIL)
 
+func updateSpawnPoint():
+	print("spawn point: " + str(spawnPoint))
+	var spawnPos = spawnPoint
+	var mc = posToChunk(spawnPoint/32)
+	while checkCell(mc) == -1:
+		spawnPos.y += 1
+		mc = posToChunk(spawnPos/32)
+	print(spawnPos)
+	spawnPos.y -= 32
+	spawnPoint = spawnPos
+	
 func spawnPlayer():
 	print("spawning player")
 	if playerScene:
@@ -230,6 +242,8 @@ func spawnPlayer():
 func killPlayer():
 	curPlayer.gun.queue_free()
 	curPlayer.queue_free()
+	updateSpawnPoint()
+	cam.global_position = spawnPoint
 
 func playerDie():
 	#print("player is dead")
