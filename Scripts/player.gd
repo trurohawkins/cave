@@ -10,12 +10,19 @@ var decelSpeed: float = 0.5
 @export var highVelocity: float = 2000
 @export var landingPower: float = 0.5
 @export var walkSpeed: float = 500
+@export var minWalk: float = 50
+@export var maxWalk: float = 1700
+@export var walkAccel: float = 0.1
 @export var walkDecel: float = 1
 
 @export var staggerPower: float = 50
 @export var invincibleTime: float = 20
-@export var gravPower = 50
-@export var maxGrav = 1400
+var gravPower = 35
+@export var flyGrav = 1400
+@export var flyGAccel = 35
+@export var walkGAccel = 500
+@export var walkGrav = 2500
+var maxGrav = 1400
 @export var blastScene: PackedScene
 @export var gunScene: PackedScene
 @export var energyMode = false
@@ -92,12 +99,15 @@ func setEnergyMode(on: bool):
 	if energyMode:
 		if !staggered:
 			bodySprite.play("in_air")
-			print("enegy mode in air")
 			decelSpeed = baseDecel
 		setEnergySprite()
 		GM.setPlayerLight(500, Vector3(0.4, 1.0, 0.2))
+		maxGrav = flyGrav
+		gravPower = flyGAccel
 	else:
 		decelSpeed = walkDecel
+		maxGrav = walkGrav
+		gravPower = walkGAccel
 		GM.setPlayerLight(300, Vector3(0.5, 0.5, 0.5))
 			
 func _physics_process(delta):
@@ -125,21 +135,11 @@ func _physics_process(delta):
 		else:
 			curGrav = maxGrav
 	else:
-		curGrav = 0		
-	camGrav(delta)
-	#dprint(str(velocity.x) + " abs " + str(abs(velocity.x)) + " -abs: " + str(-abs(velocity.x)))
+		curGrav = 0	
+	print("grav: " + str(curGrav))
 	if velocity != Vector2.ZERO:
-		var decel = Vector2(-sign(velocity.x), -sign(velocity.y)) * decelSpeed * delta
-		#print(str(velocity) + " " + str(velocity.length()) + " decel " + str(decel))
-		var check = velocity + decel
-		#print(" check length: " + str(check.length()))
-		if check.length() < 20:
-			velocity = Vector2.ZERO
-		else:
-			#print(str(velocity) + " + " + str(decel) + " = " + str(velocity + decel))
-			velocity += decel
-
 		var power = min(velocity.length(), highVelocity) / highVelocity
+		print("power: " + str(power) + " velo: " + str(velocity))
 		#camGrav(delta)
 		var myVelocity = velocity
 		move_and_slide()
@@ -183,6 +183,12 @@ func control(delta: float):
 		return walk(delta)
 
 var grounded: bool = false
+var curDir: int = 0
+var curWalk: float = 0
+var jumping: int = 0
+var jumpMax: int = 1
+var jumpPow: int = 3000
+var curJump = 0
 
 func walk(delta: float):
 	if groundCheck.is_colliding():
@@ -193,30 +199,34 @@ func walk(delta: float):
 	else:
 		grounded = false
 		rotation = cam.rotation
-
-	if Input.is_action_pressed("move_up") && grounded:
+	var jump = Vector2(0, 0)
+	if Input.is_action_just_pressed("move_up") && jumping < jumpMax:
+		jumping += 1
+		curJump = 0
 		#print("jumP " + str(cam.rotation))
-		var jump = Vector2(0, -1)
+	if jumping != 0:
+		if curJump + delta < 0.5:
+			curJump += delta
+		else:
+			curJump = 0.5
+			jumping = 0
+		var jPower = 700 * sin(curJump * 1 * TAU)
+		#print("curJump: " + str(curJump) + " jumpung: " + str(jPower))
+		jump = Vector2(0, -1)
 		jump = jump.rotated(cam.rotation)
 		#print(jump)
-		velocity += jump * delta * 3000
+		jump = jump * jPower
 	if Input.is_action_just_pressed("move_down"):
 		bodySprite.play_backwards("rise")
 		velocity = Vector2.ZERO
 		crouching = 1
 		idle = 100
 	elif Input.is_action_just_released("move_down"):
-		print(bodySprite.frame)
 		bodySprite.play("rise")
-		'''
-		if crouching == 2:
-			
-			crouching = 1
-		elif crouching == 1:
-			print(bodySprite.frame)
-			crouching = 0
-		'''
+
 	var dir = 0;
+	var walkDir = Vector2(0, 0)
+
 	if crouching == 0:
 		if Input.is_action_pressed("move_left"):
 			dir -= 1
@@ -224,10 +234,26 @@ func walk(delta: float):
 		if Input.is_action_pressed("move_right"):
 			dir += 1
 			bodySprite.flip_h = false
+		if !(Input.is_action_pressed("move_left") || Input.is_action_pressed("move_right")):
+			dir = 0
 		if dir != 0:
-			var move = Vector2(dir, 0)
-			move = move.rotated(rotation)
-			velocity += move * delta * walkSpeed
+			if curDir != dir:
+				curWalk = 0
+			else:
+				curWalk += walkAccel
+			curDir = dir
+		else:
+			if curWalk - walkDecel > 0:
+				curWalk -= walkDecel
+			else:
+				curWalk = 0
+		walkSpeed = lerpf(minWalk, maxWalk, curWalk)
+		var move = Vector2(curDir, 0)
+		move = move.rotated(rotation)
+		walkDir = move * delta * walkSpeed
+	var grav = Vector2.DOWN.rotated(cam.rotation) * delta * curGrav
+	#print(str(grav) + " " + str(jump))
+	velocity = walkDir + jump + grav
 	if grounded:
 		if !crouching:
 			if dir == 0:
@@ -246,6 +272,17 @@ func walk(delta: float):
 @export var rotSpeed: float = 0.1
 
 func thrust(delta: float):
+	if velocity != Vector2.ZERO:
+		var decel = Vector2(-sign(velocity.x), -sign(velocity.y)) * decelSpeed * delta
+		#print(str(velocity) + " " + str(velocity.length()) + " decel " + str(decel))
+		var check = velocity + decel
+		#print(" check length: " + str(check.length()))
+		if check.length() < 20:
+			velocity = Vector2.ZERO
+		else:
+			#print(str(velocity) + " + " + str(decel) + " = " + str(velocity + decel))
+			velocity += decel
+	camGrav(delta)
 	var direction = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if direction != Vector2.ZERO:
 		#print(str(direction) + " " + str(direction.length()))
