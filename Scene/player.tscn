@@ -316,7 +316,7 @@ walkDecel = 0.5
 staggerPower = 5.0
 invincibleTime = 5.0
 walkGAccel = 600
-walkGrav = 25000
+walkGrav = 45000
 blastScene = ExtResource("2_p6qlh")
 gunScene = ExtResource("3_2sw5t")
 rotSpeed = 5.0
@@ -331,8 +331,13 @@ position = Vector2(0, 17.5)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("4_p6qlh")
 
-[node name="RayCast2D" type="RayCast2D" parent="."]
-target_position = Vector2(0, 48)
+[node name="GroundCheck" type="RayCast2D" parent="."]
+position = Vector2(0, 18)
+target_position = Vector2(0, 20)
+
+[node name="ForwardCheck" type="RayCast2D" parent="."]
+position = Vector2(0, 18)
+target_position = Vector2(24, 0)
 
 [node name="energySprite" type="Sprite2D" parent="."]
 visible = false
@@ -345,7 +350,7 @@ vframes = 3
 material = SubResource("ShaderMaterial_2sw5t")
 position = Vector2(0, 5)
 sprite_frames = SubResource("SpriteFrames_eqmt2")
-animation = &"hurt"
+animation = &"idle_front"
 speed_scale = 2.0
 flip_h = true
 

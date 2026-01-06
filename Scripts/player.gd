@@ -33,7 +33,8 @@ var gun
 #@onready var energySprite = $deetSprite
 @onready var energySprite = $energySprite
 @onready var thrustSprite = $thrustSprite
-@onready var groundCheck = $RayCast2D
+@onready var groundCheck = $GroundCheck
+@onready var forwardCheck = $ForwardCheck
 @onready var bodySprite: AnimatedSprite2D = $BodySprite
 @onready var clean = $Cleaner
 
@@ -192,6 +193,11 @@ var curJump = 0
 
 func walk(delta: float):
 	if groundCheck.is_colliding():
+		var colPoint : Vector2 = groundCheck.get_collision_point()
+		var dist = colPoint.distance_to(global_position)
+		if dist > 33:
+			var diff = dist - 33
+			global_position.y += diff
 		grounded = true
 		var normal: Vector2 = groundCheck.get_collision_normal()
 		rotation = normal.angle() + deg_to_rad(90)
@@ -236,6 +242,7 @@ func walk(delta: float):
 			bodySprite.flip_h = false
 		if !(Input.is_action_pressed("move_left") || Input.is_action_pressed("move_right")):
 			dir = 0
+		forwardCheck.target_position = Vector2(24 * dir, 0)
 		if dir != 0:
 			if curDir != dir:
 				curWalk = 0
@@ -251,6 +258,9 @@ func walk(delta: float):
 		var move = Vector2(curDir, 0)
 		move = move.rotated(rotation)
 		walkDir = move * delta * walkSpeed
+	if forwardCheck.is_colliding():
+		walkDir = Vector2(0,0)
+		curWalk = 0
 	var grav = Vector2.DOWN.rotated(cam.rotation) * delta * curGrav
 	#print(str(grav) + " " + str(jump))
 	velocity = walkDir + jump + grav
