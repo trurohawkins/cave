@@ -58,6 +58,8 @@ var rechargeSpeed: float = 3#0.2
 
 var idle: int = 100
 var crouching: int = 0
+var sleepTime: int = 20
+var sleep: int = 0
 var dead: int = 0
 
 func _ready():
@@ -68,7 +70,7 @@ func _ready():
 	get_tree().current_scene.add_child(gun)
 	gun.player = self
 	gun.scale = scale / 2
-	#adddwdbodySprite.play("rise")
+	#bodySprite.play("sleep")
 	#setEnergySaturate()
 
 func setEnergySprite():
@@ -85,7 +87,7 @@ func setEnergySprite():
 		#gun.handEnergySprite.material.set_shader_parameter("desaturation", 1.0 - (energy/energyMax))
 	
 func receiveGM(gm, camera):
-	print("sawned at " + str(global_position/32))
+	print("spawned at " + str(global_position/32))
 	GM = gm
 	gun.GM = gm
 	clean.GM = gm
@@ -137,10 +139,10 @@ func _physics_process(delta):
 			curGrav = maxGrav
 	else:
 		curGrav = 0	
-	print("grav: " + str(curGrav))
+	#print("grav: " + str(curGrav))
 	if velocity != Vector2.ZERO:
 		var power = min(velocity.length(), highVelocity) / highVelocity
-		print("power: " + str(power) + " velo: " + str(velocity))
+		#print("power: " + str(power) + " velo: " + str(velocity))
 		#camGrav(delta)
 		var myVelocity = velocity
 		move_and_slide()
@@ -207,8 +209,12 @@ func walk(delta: float):
 		rotation = cam.rotation
 	var jump = Vector2(0, 0)
 	if Input.is_action_just_pressed("move_up") && jumping < jumpMax:
-		jumping += 1
-		curJump = 0
+		if crouching == 0:
+			jumping += 1
+			curJump = 0
+		elif crouching == 3:
+			bodySprite.play("rise")
+		print(crouching)
 		#print("jumP " + str(cam.rotation))
 	if jumping != 0:
 		if curJump + delta < 0.5:
@@ -228,7 +234,15 @@ func walk(delta: float):
 		crouching = 1
 		idle = 100
 	elif Input.is_action_just_released("move_down"):
-		bodySprite.play("rise")
+		if crouching < 3:
+			bodySprite.play("rise")
+	else:
+		if crouching == 2:
+			if sleep < sleepTime:
+				sleep += 1
+			else:
+				crouching = 3
+				bodySprite.play("sleep")
 
 	var dir = 0;
 	var walkDir = Vector2(0, 0)
@@ -265,7 +279,7 @@ func walk(delta: float):
 	#print(str(grav) + " " + str(jump))
 	velocity = walkDir + jump + grav
 	if grounded:
-		if !crouching:
+		if crouching == 0:
 			if dir == 0:
 				if idle < 100:
 					bodySprite.play("idle_side")
@@ -417,7 +431,7 @@ func _on_body_sprite_animation_changed():
 func _on_body_sprite_frame_changed():
 	if bodySprite.animation == "rise":
 		var progress = float(bodySprite.frame) / float(bodySprite.sprite_frames.get_frame_count("rise"))
-		print(str(bodySprite.frame) + " " + str(progress))
+		#print(str(bodySprite.frame) + " " + str(progress))
 		var rect: RectangleShape2D = body.shape
 		rect.size.y = lerp(30, 60, progress)
 		body.position.y = lerp(18.0, 3.0, progress)
