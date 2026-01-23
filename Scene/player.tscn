@@ -251,7 +251,7 @@ texture = ExtResource("4_p6qlh")
 
 [node name="GroundCheck" type="RayCast2D" parent="."]
 position = Vector2(0, 18)
-target_position = Vector2(0, 20)
+target_position = Vector2(0, 21)
 
 [node name="ForwardCheck" type="RayCast2D" parent="."]
 position = Vector2(0, 18)

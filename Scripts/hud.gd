@@ -36,7 +36,8 @@ func _process(delta):
 		if Input.is_action_just_pressed("shoot"):
 			fadeTo(Color(0, 0, 0, 0))
 			textUp = ""
-			onFinish = Callable(GM, "spawnPlayer")
+			GM.spawnPlayer()
+			#onFinish = Callable(GM, "spawnPlayer")
 			
 
 func fadeTo(color: Color):
@@ -46,5 +47,6 @@ func fadeTo(color: Color):
 func deathSequence(gm):
 	GM = gm
 	fadeTo(Color.BLACK)
+	#fadeTo(Color(0, 1, 0, 0))
 	textUp = "I had the strangest dream, There was something immense and it made my eyes hurt"
 	onFinish = Callable(GM, "killPlayer")

@@ -57,10 +57,11 @@ var rPauseTimer = 0
 var rechargeSpeed: float = 3#0.2
 
 var idle: int = 100
-var crouching: int = 0
-var sleepTime: int = 20
+var crouching: int = 3
+var sleepTime: int = 60
 var sleep: int = 0
 var dead: int = 0
+var alive = 0
 
 func _ready():
 	decelSpeed = baseDecel
@@ -70,7 +71,10 @@ func _ready():
 	get_tree().current_scene.add_child(gun)
 	gun.player = self
 	gun.scale = scale / 2
-	#bodySprite.play("sleep")
+	var rect: RectangleShape2D = body.shape
+	print("player ready")
+	rect.size = Vector2(32, 30)
+	bodySprite.play("sleep")
 	#setEnergySaturate()
 
 func setEnergySprite():
@@ -114,6 +118,9 @@ func setEnergyMode(on: bool):
 		GM.setPlayerLight(300, Vector3(0.5, 0.5, 0.5))
 			
 func _physics_process(delta):
+	if alive < 35:#it takes a sec on respawningt ofor things to work
+		alive += 1
+		return
 	if dead > 0:
 		if dead == 1:
 			bodySprite.play("hurt")
@@ -163,8 +170,6 @@ func _physics_process(delta):
 				crashDir = crashDir.angle()
 				var diff = rad_to_deg(wrapf(myDir - crashDir, -PI, PI))
 				if power >= landingPower:
-
-					
 					if abs(diff) < 45:
 						crash(collision.get_position(), power)
 	if rPauseTimer - delta > 0:
@@ -194,6 +199,8 @@ var jumpPow: int = 3000
 var curJump = 0
 
 func walk(delta: float):
+	if Engine.get_physics_frames() < 25:#it takes a few frames for tilemap world to become collidable
+		return false
 	if groundCheck.is_colliding():
 		var colPoint : Vector2 = groundCheck.get_collision_point()
 		var dist = colPoint.distance_to(global_position)
@@ -207,14 +214,15 @@ func walk(delta: float):
 	else:
 		grounded = false
 		rotation = cam.rotation
+	#print("grounded: " + str(grounded))
 	var jump = Vector2(0, 0)
 	if Input.is_action_just_pressed("move_up") && jumping < jumpMax:
 		if crouching == 0:
 			jumping += 1
 			curJump = 0
 		elif crouching == 3:
+			crouching = 1
 			bodySprite.play("rise")
-		print(crouching)
 		#print("jumP " + str(cam.rotation))
 	if jumping != 0:
 		if curJump + delta < 0.5:
@@ -229,18 +237,22 @@ func walk(delta: float):
 		#print(jump)
 		jump = jump * jPower
 	if Input.is_action_just_pressed("move_down"):
-		bodySprite.play_backwards("rise")
-		velocity = Vector2.ZERO
-		crouching = 1
-		idle = 100
+		if crouching == 0:
+			bodySprite.play_backwards("rise")
+			velocity = Vector2.ZERO
+			crouching = 1
+			idle = 100
 	elif Input.is_action_just_released("move_down"):
+		#dprint("release " + str(crouching))
 		if crouching < 3:
+			crouching = 1
 			bodySprite.play("rise")
 	else:
 		if crouching == 2:
 			if sleep < sleepTime:
 				sleep += 1
 			else:
+				sleep = 0
 				crouching = 3
 				bodySprite.play("sleep")
 
@@ -272,6 +284,10 @@ func walk(delta: float):
 		var move = Vector2(curDir, 0)
 		move = move.rotated(rotation)
 		walkDir = move * delta * walkSpeed
+	elif crouching == 3:
+		if Input.is_action_pressed("move_left") || Input.is_action_pressed("move_right"):
+			crouching = 1
+			bodySprite.play("rise")
 	if forwardCheck.is_colliding():
 		walkDir = Vector2(0,0)
 		curWalk = 0
@@ -289,6 +305,8 @@ func walk(delta: float):
 			else:
 				bodySprite.play("walk")
 				idle = 0
+		elif crouching >= 2 && (bodySprite.animation != "sleep" || bodySprite.animation != "rise"):
+			bodySprite.play("sleep")
 	else:
 		bodySprite.play("in_air")
 	return grounded
@@ -340,7 +358,7 @@ func camGrav(delta):
 	
 func crash(pos: Vector2, power: float):
 	#print(power)
-	if power < landingPower:
+	if power <= landingPower:
 		return
 	print(str(power) + " < " + str(landingPower))
 	if !invincible:
@@ -389,7 +407,6 @@ func stagger(stagged: bool):
 		staggered = true
 		bodySprite.play("hurt")
 	elif staggered:
-		print("not staggered")
 		bodySprite.play("in_air")
 		staggerCounter = 0
 		staggered = false
